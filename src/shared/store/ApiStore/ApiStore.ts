@@ -8,48 +8,54 @@ export default class ApiStore implements IApiStore {
         this.baseUrl = baseUrl;
     }
 
-    async request<SuccessT, ErrorT = any, ReqT = {}>(params: RequestParams<ReqT>): Promise<ApiResponse<SuccessT, ErrorT>> {
-        
-        let options: Object = {};
-        let newEndpoint: string = this.baseUrl + params.endpoint;
-        if (params.method === HTTPMethod.GET) {
-            const queryString: string = qs.stringify(params.data)
-            newEndpoint = newEndpoint + '?' + queryString;
+    private getRequestData<ReqT = {}>(params: RequestParams<ReqT>): [string, RequestInit] {
+        const options: RequestInit = {};
+        options.method = params.method;
+        options.headers = params.headers;
 
-            options = {
-                method: params.method,
-                headers: params.headers
-            }
+        let newEndpoint = `${this.baseUrl}${params.endpoint}`;
+
+        if (params.method === HTTPMethod.GET) {
+            newEndpoint = `${newEndpoint}?${qs.stringify(params.data)}`;
         }
         else if (params.method === HTTPMethod.POST) {
             const dataJSON = JSON.stringify(params.data);
-            const extendedHeaders: Record<string, string> = params.headers;
-            extendedHeaders['Content-Type'] = "application/json;charset=utf-8";
 
-            options = {
-                method: params.method,
-                headers: extendedHeaders,
-                body: dataJSON
-            }
+            options.headers['Content-Type'] = "application/json;charset=utf-8";
+            options.body = dataJSON;
         }
 
-        return await fetch(newEndpoint, options)
-        .then(async (result) => {
-            const obj: ApiResponse<SuccessT, never> = {
-                success: true,
-                data: await result.json(),
-                status: StatusHTTP.OK
-            };
-            return obj;
-        })
-        .catch((error) => {
-            const obj: ApiResponse<never, ErrorT> = {
-                success: false,
+        return [newEndpoint, options];
+    }
+
+    async request<SuccessT, ErrorT = any, ReqT = {}>(params: RequestParams<ReqT>): Promise<ApiResponse<SuccessT, ErrorT>> {
+        
+        try {
+            return await fetch(...this.getRequestData(params))
+            .then(async (result) => {
+                const obj: ApiResponse<SuccessT, never> = {
+                    success: true,
+                    data: await result.json(),
+                    status: StatusHTTP.OK
+                };
+                return obj;
+            })
+            .catch((error) => {
+                const obj: ApiResponse<never, ErrorT> = {
+                    success: false,
+                    data: error.message
+                };
+                return obj;
+            })
+        } 
+        catch (error) {
+            return {
                 data: error.message,
-                status: StatusHTTP.NOT_FOUND,
-            };
-            return obj;
-        })
+                status: StatusHTTP.UNEXPECTED_ERROR,
+                success: false
+            }
+        }
+        
 
     }
 

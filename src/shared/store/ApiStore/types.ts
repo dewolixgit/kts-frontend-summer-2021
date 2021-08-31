@@ -20,22 +20,27 @@ export type RequestParams<ReqT> = {
 
 // Перечисление статусов ответа
 export enum StatusHTTP {
-    NOT_FOUND = 404,
     OK = 200,
+    UNEXPECTED_ERROR = 'UNEXPECTED_ERROR'
 }
 
 // Ответ API
 export type ApiResponse<SuccessT, ErrorT> =
     | {
-    success: true;
-    data: SuccessT;
-    status: StatusHTTP.OK;
-}
+        success: true;
+        data: SuccessT;
+        status: StatusHTTP.OK;
+    }
     | {
-    success: false;
-    data: ErrorT;
-    status: StatusHTTP.NOT_FOUND;
-};
+        success: false;
+        data: ErrorT;
+        status?: number;
+    }
+    | {
+        success: false;
+        data: string;
+        status: StatusHTTP.UNEXPECTED_ERROR;
+    };
 
 
 // Интерфейс для класса, с помощью которого можно делать запросы к API
