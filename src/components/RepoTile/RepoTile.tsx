@@ -6,18 +6,23 @@ import { RepoItem } from "src/store/GitHubStore/types";
 
 import "./RepoTile.css";
 
-const RepoTile: React.FC<RepoItem> = ({
+type ClickHandler = {
+  onClick?: (event: React.MouseEvent) => void;
+};
+
+const RepoTile: React.FC<RepoItem & ClickHandler> = ({
   name,
   stargazers_count,
   updated_at,
   owner,
+  onClick,
 }) => {
   const repoNameFirstLetter = name[0].toUpperCase();
   const repoUrl = `https://github.com/${owner.login}/${name}`;
   const ownerUrl = `https://github.com/${owner.login}`;
 
   return (
-    <div className="repo-tile">
+    <div className="repo-tile" onClick={onClick}>
       <Avatar alt={`repository name is ${name}`} letter={repoNameFirstLetter} />
       <div className="repo-tile__content">
         <div className="repo-tile__name">

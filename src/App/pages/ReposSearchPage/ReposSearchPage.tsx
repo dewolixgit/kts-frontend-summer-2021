@@ -4,9 +4,11 @@ import { useState } from "react";
 import SearchIcon from "@assets/SearchIcon";
 import Button from "@components/Button";
 import Input from "@components/Input";
+import RepoBranchesDrawer from "@components/RepoBranchesDrawer";
 import RepoTile from "@components/RepoTile";
 import GitHubStore from "@store/GitHubStore";
 import { RepoItem } from "@store/GitHubStore/types";
+// eslint-disable-next-line import/order
 import { log } from "@utils/log";
 
 import "./ReposSearchPage.css";
@@ -15,32 +17,7 @@ type ResponseStateProps = {
   isLoading: boolean;
   repos: RepoItem[] | null;
   currentInputValue: string;
-};
-
-const ReposList: React.FC<ResponseStateProps> = (
-  responseState: ResponseStateProps
-) => {
-  const repos = responseState.repos;
-
-  if (responseState.isLoading) {
-    return <div>Загрузка{log("загрузка")}</div>;
-  } else if (!repos) {
-    return <>{log("не найдено")}</>;
-  } else {
-    return (
-      <div className="repo-list">
-        {repos.map((item, index) => (
-          <RepoTile
-            name={repos[index].name}
-            owner={repos[index].owner}
-            stargazers_count={repos[index].stargazers_count}
-            updated_at={repos[index].updated_at}
-            key={repos[index].id}
-          />
-        ))}
-      </div>
-    );
-  }
+  selectedRepo: RepoItem | null;
 };
 
 const ReposSearchPage = () => {
@@ -48,7 +25,10 @@ const ReposSearchPage = () => {
     isLoading: false,
     repos: null,
     currentInputValue: "",
+    selectedRepo: null,
   });
+
+  const [drawerVisible, setDrawerVisible] = React.useState<boolean>(false);
 
   const handleBtnClick = () => {};
 
@@ -57,6 +37,7 @@ const ReposSearchPage = () => {
       isLoading: true,
       repos: null,
       currentInputValue: responseState.currentInputValue,
+      selectedRepo: null,
     });
 
     const gitHubStore = new GitHubStore();
@@ -69,12 +50,14 @@ const ReposSearchPage = () => {
             isLoading: false,
             repos: result,
             currentInputValue: responseState.currentInputValue,
+            selectedRepo: null,
           });
         } else {
           setResponseState({
             isLoading: false,
             repos: [],
             currentInputValue: responseState.currentInputValue,
+            selectedRepo: null,
           });
         }
       });
@@ -85,6 +68,52 @@ const ReposSearchPage = () => {
       ...responseState,
       currentInputValue: event.currentTarget.value,
     });
+  };
+
+  const wrapperRepoTitleClick = (repo: RepoItem) => {
+    const selectedRepo = repo;
+
+    return (clickEvent: React.MouseEvent) => {
+      log(`now ${selectedRepo.name} is selected`);
+      setResponseState({
+        ...responseState,
+        selectedRepo: selectedRepo,
+      });
+
+      setDrawerVisible(true);
+    };
+  };
+
+  const onCloseHandler = () => {
+    log("onCloseHandler");
+    setDrawerVisible(false);
+  };
+
+  const ReposList: (
+    responseState: ResponseStateProps
+  ) => React.ReactElement | null = (responseState) => {
+    if (responseState.isLoading) {
+      return <div>Загрузка{log("загрузка")}</div>;
+    } else if (!responseState.repos) {
+      return <>{log("не найдено")}</>;
+    } else {
+      const repos = responseState.repos;
+
+      return (
+        <div className="repo-list">
+          {repos.map((repoItem, index) => (
+            <RepoTile
+              name={repos[index].name}
+              owner={repos[index].owner}
+              stargazers_count={repos[index].stargazers_count}
+              updated_at={repos[index].updated_at}
+              key={repos[index].id}
+              onClick={wrapperRepoTitleClick(repoItem)}
+            />
+          ))}
+        </div>
+      );
+    }
   };
 
   return (
@@ -103,7 +132,11 @@ const ReposSearchPage = () => {
 
       <ReposList {...responseState} />
 
-      {log()}
+      <RepoBranchesDrawer
+        selectedRepo={responseState.selectedRepo}
+        onClose={onCloseHandler}
+        visible={drawerVisible}
+      />
     </div>
   );
 };
