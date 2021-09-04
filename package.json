@@ -20,8 +20,8 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
-    "lint": "eslint './src/**/*.{ts,tsx}'",
-    "lint:fix": "eslint './src/**/*.{ts,tsx}' --fix"
+    "lint": "./node_modules/.bin/eslint --ext .tsx,.ts src",
+    "lint:fix": "./node_modules/.bin/eslint --fix --ext .tsx,.ts src"
   },
   "eslintConfig": {
     "extends": [

@@ -6,6 +6,7 @@
     --link-hover-color: #208FBF;
     --disabled-input-color: #F9F9F9;
     --disabled-btn-color: #D9D9D9;
+    --white-color: #fff;
 }
 
 body {
@@ -13,7 +14,7 @@ body {
     padding: 0;
     font-family: 'Roboto', sans-serif;
     font-size: 14px;
-    color: var(--default-color, #000);
+    color: var(--default-color);
 }
 
 *, *::after, *::before {
@@ -39,7 +40,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .search-form__input {
-    border: 1px solid var(--inner-border-color, #D9D9D9);
+    border: 1px solid var(--inner-border-color);
     border-radius: 6px;
     width: 295px;
     padding-left: 12px;
@@ -51,11 +52,11 @@ h1, h2, h3, h4, h5, h6 {
 
 .search-form__input:focus {
     outline: none;
-    border: 1px solid var(--accent-color, #FF5555);
+    border: 1px solid var(--accent-color);
 }
 
 .search-form__input:disabled {
-    background:var(--disabled-input-color,  #F9F9F9);
+    background:var(--disabled-input-color);
 }
 
 .search-form__btn {
@@ -64,15 +65,12 @@ h1, h2, h3, h4, h5, h6 {
     width: 50px;
     height: 50px;
     border-radius: 6px;
-    background-color: var(--accent-color, #FF5555);
 
     display: flex;
     justify-content: center;
     align-items: center;
 
-    background-image: url(./assets/search-icon.svg);
-    background-repeat: no-repeat;
-    background-position: center;
+    background: var(--accent-color) url(./assets/search-icon.svg) center no-repeat;
 }
 
 .search-form__btn:hover {
@@ -82,7 +80,7 @@ h1, h2, h3, h4, h5, h6 {
 .search-form__btn:disabled,
 .search-form__btn:disabled:hover {
     opacity: 1;
-    background-color: var(--disabled-btn-color, #D9D9D9);
+    background-color: var(--disabled-btn-color);
 }
 
 .repository {
@@ -91,7 +89,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 12px;
     margin-bottom: 16px;
 
-    border: 1px solid var(--inner-border-color, #D9D9D9);
+    border: 1px solid var(--inner-border-color);
     border-radius: 6px;
 }
 
@@ -100,8 +98,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .repository__content {
-    font-style: normal;
-    font-weight: normal;
     font-size: 14px;
     line-height: 16px;
 }
@@ -110,8 +106,8 @@ h1, h2, h3, h4, h5, h6 {
     width: 80px;
     height: 80px;
     margin-right: 12px;
-    background-color: var(--accent-color, #FF5555);
-    color: #fff;
+    background-color: var(--accent-color);
+    color: var(--white-color);
     font-style: normal;
     font-weight: bold;
     font-size: 40px;
@@ -134,7 +130,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .repository__name a {
-    color: var(--default-color, #000);
+    color: var(--default-color);
     text-decoration: none;   
 }
 
@@ -144,11 +140,11 @@ h1, h2, h3, h4, h5, h6 {
 
 .repository__author a {
     text-decoration: none;
-    color: var(--hint-color, #7E7E7E);
+    color: var(--hint-color);
 }
 
 .repository__author a:hover {
-    color: var(--link-hover-color, #208FBF);
+    color: var(--link-hover-color);
     
 }
 
@@ -161,7 +157,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .repository__data {
-    color: var(--hint-color, #7E7E7E);
+    color: var(--hint-color);
     display: flex;
 }
 
@@ -169,6 +165,6 @@ h1, h2, h3, h4, h5, h6 {
     margin-right: 20px;
 }
 
-.repository__rating object {
+.repository__rating-star {
     vertical-align: top;
 }
