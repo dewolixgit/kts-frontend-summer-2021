@@ -24,4 +24,4 @@ const StarIcon: React.FC<StarIconProps> = ({ className }) => {
   );
 };
 
-export default StarIcon;
+export default React.memo(StarIcon);

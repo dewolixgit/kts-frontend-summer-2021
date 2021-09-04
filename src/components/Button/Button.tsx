@@ -24,4 +24,4 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   );
 };
 
-export default Button;
+export default React.memo(Button);

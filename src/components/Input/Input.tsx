@@ -1,7 +1,5 @@
 import React from "react";
 
-import { log } from "@utils/log";
-
 import "./Input.css";
 
 type InputProps = {
@@ -19,8 +17,6 @@ const Input: React.FC<InputProps> = ({
   className,
   isDisabled,
 }) => {
-  log("sdfijsdhoui");
-
   return (
     <input
       type="text"

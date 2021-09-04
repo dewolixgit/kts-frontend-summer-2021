@@ -1,8 +1,7 @@
 import React from "react";
-import "antd/dist/antd.css";
 
 import "./App.css";
-import ReposSearchPage from "./Pages/ReposSearchPage";
+import ReposSearchPage from "./pages/ReposSearchPage";
 
 const App = () => {
   return (

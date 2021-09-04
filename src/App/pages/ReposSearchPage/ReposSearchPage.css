@@ -1,0 +1,20 @@
+@import url("@components/variables.css");
+
+.repos-search-page {
+  max-width: 397px;
+  margin: 0 auto;
+  padding: 20px;
+  display: grid;
+}
+
+.search-form {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.loading-message,
+.error-message {
+  margin: 0 auto;
+  opacity: 0.7;
+}
