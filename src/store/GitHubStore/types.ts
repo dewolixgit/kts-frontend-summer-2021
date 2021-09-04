@@ -10,6 +10,11 @@ export type GetOrganizationReposListParams = {
   page?: number;
 };
 
+export type GetRepoBranchesProps = {
+  owner: string;
+  repo: RepoItem;
+};
+
 export type GetOrganizationReposListParamsForQueryStr = Omit<
   GetOrganizationReposListParams,
   "accept" | "org"
@@ -32,4 +37,18 @@ export type RepoItem = {
   updated_at: string; //или лучше передавать как тип Date??
   owner: RepoOwner;
   id?: number;
+};
+
+export type ApiBranchesResponse =
+  | {
+      success: true;
+      data: BranchItem[];
+    }
+  | {
+      success: false;
+      data: any;
+    };
+
+export type BranchItem = {
+  name: string;
 };

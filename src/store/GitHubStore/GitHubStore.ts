@@ -9,10 +9,13 @@ import {
   GetOrganizationReposListParams,
   RepoItem,
   GetOrganizationReposListParamsForQueryStr,
+  GetRepoBranchesProps,
+  ApiBranchesResponse,
 } from "./types";
 
 export default class GitHubStore implements IGitHubStore {
-  private readonly apiStore = new ApiStore("https://api.github.com");
+  private readonly baseUrl = "https://api.github.com";
+  private readonly apiStore = new ApiStore(this.baseUrl);
 
   async getOrganizationReposList(
     params: GetOrganizationReposListParams
@@ -36,5 +39,34 @@ export default class GitHubStore implements IGitHubStore {
       };
 
     return await this.apiStore.request(paramsToRequest);
+  }
+
+  async getRepoBranches(
+    params: GetRepoBranchesProps
+  ): Promise<ApiBranchesResponse> {
+    try {
+      return await fetch(
+        `${this.baseUrl}/repos/${params.owner}/${params.repo.name}/branches`
+      )
+        .then(async (result) => {
+          const obj: ApiBranchesResponse = {
+            data: await result.json(),
+            success: true,
+          };
+          return obj;
+        })
+        .catch((error) => {
+          const obj: ApiBranchesResponse = {
+            data: error,
+            success: false,
+          };
+          return obj;
+        });
+    } catch (error) {
+      return {
+        data: error,
+        success: false,
+      };
+    }
   }
 }

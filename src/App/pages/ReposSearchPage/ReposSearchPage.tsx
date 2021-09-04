@@ -102,6 +102,8 @@ const ReposSearchPage = () => {
       </form>
 
       <ReposList {...responseState} />
+
+      {log()}
     </div>
   );
 };
