@@ -22,4 +22,14 @@ export interface IGitHubStore {
   ): Promise<ApiResponse<RepoItem[], string>>;
 }
 
-export type RepoItem = {};
+export type RepoOwner = {
+  login: string;
+};
+
+export type RepoItem = {
+  name: string;
+  stargazers_count: number;
+  updated_at: string; //или лучше передавать как тип Date??
+  owner: RepoOwner;
+  id?: number;
+};

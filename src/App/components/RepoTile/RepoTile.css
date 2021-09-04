@@ -1,0 +1,66 @@
+@import url("@components/variables.css");
+
+.repo-tile {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 16px;
+
+  border: 1px solid var(--inner-border-color);
+  border-radius: 6px;
+}
+
+.repo-tile:hover {
+  box-shadow: 0px 2px 6px rgba(182, 182, 182, 0.25);
+}
+
+.repo-tile__content {
+  font-size: 14px;
+  line-height: 16px;
+}
+
+.repo-tile__name {
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 19px;
+  margin-bottom: 4px;
+}
+
+.repo-tile__name a {
+  color: var(--default-color);
+  text-decoration: none;
+}
+
+.repo-tile__owner {
+  margin-bottom: 4px;
+}
+
+.repo-tile__owner a {
+  text-decoration: none;
+  color: var(--hint-color);
+}
+
+.repo-tile__owner a:hover {
+  color: var(--link-hover-color);
+}
+
+.repo-tile__name,
+.repo-tile__owner {
+  max-width: 241px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.repo-tile__data {
+  color: var(--hint-color);
+  display: flex;
+}
+
+.repo-tile__rating {
+  margin-right: 20px;
+}
+
+.repo-tile__rating-star {
+  vertical-align: top;
+}

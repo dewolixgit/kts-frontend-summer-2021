@@ -1,3 +1,5 @@
+import { log } from "@utils/log";
+
 import GitHubStore from "../store/GitHubStore/GitHubStore";
 
 const gitHubStore = new GitHubStore();
@@ -9,5 +11,5 @@ gitHubStore
     org: EXAMPLE_ORGANIZATION,
   })
   .then((result) => {
-    console.log(result);
+    log(result);
   });
