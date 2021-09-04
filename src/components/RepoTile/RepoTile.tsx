@@ -30,7 +30,9 @@ const RepoTile: React.FC<RepoItem> = ({
           <div className="repo-tile__rating">
             <StarIcon className="repo-tile__rating-star" /> {stargazers_count}
           </div>
-          <div className="repo-tile__update-date">{updated_at}</div>
+          <div className="repo-tile__update-date">
+            Updated at {updated_at.slice(0, 10)}
+          </div>
         </div>
       </div>
     </div>
