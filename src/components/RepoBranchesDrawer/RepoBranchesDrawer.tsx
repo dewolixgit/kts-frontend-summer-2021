@@ -1,21 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
 import "antd/dist/antd.css";
 
 import GitHubStore from "@store/GitHubStore";
-import { RepoItem } from "@store/GitHubStore/types";
-import { log } from "@utils/log";
+import { BranchItem, RepoItem } from "@store/GitHubStore/types";
 import { Drawer } from "antd";
+import { useHistory, useParams } from "react-router-dom";
 
 type RepoBranchesDrawerProps = {
   selectedRepo: RepoItem | null;
   onClose: () => void;
   visible: boolean;
-};
-
-type DrawerState = {
-  branches: RepoItem[];
-  isLoading: boolean;
 };
 
 type DrawerProperies = {
@@ -29,63 +24,83 @@ const RepoBranchesDrawer: React.FC<RepoBranchesDrawerProps> = ({
   selectedRepo,
   visible,
 }) => {
-  const [drawerState, setDrawerState] = React.useState<DrawerState>({
-    branches: [],
-    isLoading: false,
-  });
+  const [branches, setBranches] = useState<BranchItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [targetRepo, setTargetRepo] = useState<RepoItem | null>(selectedRepo);
 
-  // const onCloseOwnHandler = () => {
-  //   onClose();
-  //   setDrawerState({
-  //     ...drawerState,
-  //     branches: [],
-  //   });
-  // };
+  const repoId = useParams<{ id?: string }>().id;
 
-  log("go into drawer");
+  let branchCounterId = 0;
 
   useEffect(() => {
-    log("go to useEffect");
-    if (!selectedRepo) return;
-
-    setDrawerState({
-      isLoading: visible ? true : false,
-      branches: [],
-    });
-
     const gitHubStore = new GitHubStore();
 
-    gitHubStore
-      .getRepoBranches({
-        repo: selectedRepo,
-        owner: selectedRepo.owner.login,
-      })
-      .then((branches) => {
-        log("go to then");
-        if (branches)
-          setDrawerState({ branches: branches.data, isLoading: false });
-      });
-  }, [visible]);
+    if (selectedRepo) {
+      setIsLoading(visible);
 
+      gitHubStore
+        .getRepoBranches({
+          repo: selectedRepo,
+          owner: selectedRepo.owner.login,
+        })
+        .then((branches) => {
+          if (branches) {
+            setBranches(branches.data);
+            setIsLoading(false);
+          }
+        });
+    } else if (!selectedRepo && repoId) {
+      setIsLoading(true);
+
+      gitHubStore
+        .getRepoById(repoId)
+        .then((response) => {
+          if (response.success) {
+            return response.data;
+          }
+        })
+        .then((repo) => {
+          if (repo) {
+            setTargetRepo(repo);
+            return gitHubStore.getRepoBranches({
+              owner: repo.owner.login,
+              repo: repo,
+            });
+          }
+        })
+        .then((branchesReponse) => {
+          if (branchesReponse && branchesReponse.success) {
+            setBranches(branchesReponse.data);
+            setIsLoading(false);
+          }
+        });
+    }
+  }, [visible, selectedRepo]);
+
+  const history = useHistory();
   const drawerOptions: DrawerProperies = {
     title: "Ветки",
     visible: visible,
-    onClose: onClose,
+    onClose: () => {
+      history.push("/repos");
+      onClose();
+    },
   };
 
-  if (drawerState.branches.length && !drawerState.isLoading) {
+  if (branches.length && !isLoading) {
     return (
       <Drawer {...drawerOptions}>
         <ul>
-          {drawerState.branches.map((branchItem) => {
-            return <li>{branchItem.name}</li>;
+          {branches.map((branchItem) => {
+            return <li key={branchCounterId++}>{branchItem.name}</li>;
           })}
         </ul>
+        Id репозитория: {targetRepo?.id}
       </Drawer>
     );
-  } else {
-    return <Drawer {...drawerOptions}></Drawer>;
   }
+
+  return <Drawer {...drawerOptions}></Drawer>;
 };
 
 export default RepoBranchesDrawer;

@@ -1,4 +1,4 @@
-@import url("@components/variables.css");
+@import "@components/variables.scss";
 
 .button {
     border: none;
@@ -6,7 +6,7 @@
     width: 50px;
     height: 50px;
     border-radius: 6px;
-    background-color: var(--accent-color);
+    background-color: $accent-color;
 
     display: flex;
     justify-content: center;
@@ -20,5 +20,5 @@
 .button:disabled,
 .button:disabled:hover {
     opacity: 1;
-    background-color: var(--disabled-btn-color);
+    background-color: $disabled-btn-color;
 }

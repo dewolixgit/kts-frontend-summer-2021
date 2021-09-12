@@ -4,7 +4,7 @@ import StarIcon from "@assets/StarIcon";
 import Avatar from "@components/Avatar";
 import { RepoItem } from "src/store/GitHubStore/types";
 
-import "./RepoTile.css";
+import styles from "./RepoTile.module.scss";
 
 type ClickHandler = {
   onClick?: (event: React.MouseEvent) => void;
@@ -15,6 +15,7 @@ const RepoTile: React.FC<RepoItem & ClickHandler> = ({
   stargazers_count,
   updated_at,
   owner,
+  id,
   onClick,
 }) => {
   const repoNameFirstLetter = name[0].toUpperCase();
@@ -22,20 +23,21 @@ const RepoTile: React.FC<RepoItem & ClickHandler> = ({
   const ownerUrl = `https://github.com/${owner.login}`;
 
   return (
-    <div className="repo-tile" onClick={onClick}>
+    <div className={styles["repo-tile"]} onClick={onClick}>
       <Avatar alt={`repository name is ${name}`} letter={repoNameFirstLetter} />
-      <div className="repo-tile__content">
-        <div className="repo-tile__name">
+      <div className={styles["repo-tile__content"]}>
+        <div className={styles["repo-tile__name"]}>
           <a href={repoUrl}>{name}</a>
         </div>
-        <div className="repo-tile__owner">
+        <div className={styles["repo-tile__owner"]}>
           <a href={ownerUrl}>{owner.login}</a>
         </div>
-        <div className="repo-tile__data">
-          <div className="repo-tile__rating">
-            <StarIcon className="repo-tile__rating-star" /> {stargazers_count}
+        <div className={styles["repo-tile__data"]}>
+          <div className={styles["repo-tile__rating"]}>
+            <StarIcon className={styles["repo-tile__rating-star"]} />{" "}
+            {stargazers_count}
           </div>
-          <div className="repo-tile__update-date">
+          <div className={styles["repo-tile__update-date"]}>
             Updated at {updated_at.slice(0, 10)}
           </div>
         </div>
@@ -44,4 +46,4 @@ const RepoTile: React.FC<RepoItem & ClickHandler> = ({
   );
 };
 
-export default RepoTile;
+export default React.memo(RepoTile);

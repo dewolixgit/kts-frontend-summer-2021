@@ -1,0 +1,66 @@
+@import "@components/variables.scss";
+
+.repo-tile {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 16px;
+
+  border: 1px solid $inner-border-color;
+  border-radius: 6px;
+
+  &:hover {
+    box-shadow: 0px 2px 6px rgba(182, 182, 182, 0.25);
+  }
+
+  &__content {
+    font-size: 14px;
+    line-height: 16px;
+  }
+
+  &__name {
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 19px;
+    margin-bottom: 4px;
+
+    a {
+      color: $default-color;
+      text-decoration: none;
+    }
+  }
+
+  &__owner {
+    margin-bottom: 4px;
+
+    a {
+      text-decoration: none;
+      color: $hint-color;
+    }
+
+    a:hover {
+      color: $link-hover-color;
+    }
+  }
+
+  &__name,
+  &__owner {
+    max-width: 241px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  &__data {
+    color: $hint-color;
+    display: flex;
+  }
+
+  &__rating {
+    margin-right: 20px;
+  }
+
+  &__rating-star {
+    vertical-align: top;
+  }
+}

@@ -1,3 +1,5 @@
+import { log } from "@utils/log";
+
 import ApiStore from "../../shared/store/ApiStore";
 import {
   ApiResponse,
@@ -68,5 +70,14 @@ export default class GitHubStore implements IGitHubStore {
         success: false,
       };
     }
+  }
+
+  async getRepoById(id: string): Promise<ApiResponse<RepoItem, string>> {
+    return this.apiStore.request({
+      data: {},
+      endpoint: `/repositories/${id}`,
+      headers: {},
+      method: HTTPMethod.GET,
+    });
   }
 }

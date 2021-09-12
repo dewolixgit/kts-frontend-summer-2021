@@ -1,11 +1,11 @@
-@import url("@components/variables.css");
+@import "@components/variables.scss";
 
 .avatar {
   width: 80px;
   height: 80px;
   margin-right: 12px;
-  background-color: var(--accent-color);
-  color: var(--white-color);
+  background-color: $accent-color;
+  color: $white-color;
   font-style: normal;
   font-weight: bold;
   font-size: 40px;
