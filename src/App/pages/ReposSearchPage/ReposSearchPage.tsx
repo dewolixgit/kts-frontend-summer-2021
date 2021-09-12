@@ -7,7 +7,7 @@ import Input from "@components/Input";
 import GitHubStore from "@store/GitHubStore";
 import { RepoItem } from "@store/GitHubStore/types";
 // eslint-disable-next-line import/order
-import { Route, Switch } from "react-router";
+import { Redirect, Route, Switch, useParams } from "react-router";
 
 import { BrowserRouter, Link } from "react-router-dom";
 
@@ -72,6 +72,7 @@ const ReposSearchPage = () => {
           </Button>
         </form>
         <Link to="/repos">go to ReposListPage</Link>
+        <Link to="">go to ReposSearchPage</Link>
 
         <Switch>
           <Provider
@@ -79,6 +80,7 @@ const ReposSearchPage = () => {
           >
             <Route exact path="/repos/:id" component={ReposListPage} />
             <Route exact path="/repos" component={ReposListPage} />
+            <Redirect to="/repos" />
           </Provider>
         </Switch>
       </BrowserRouter>
