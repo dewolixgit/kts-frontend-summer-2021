@@ -1,0 +1,21 @@
+@import url("@components/variables.css");
+
+.input {
+  border: 1px solid var(--inner-border-color);
+  border-radius: 6px;
+  width: 295px;
+  padding-left: 12px;
+
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 16px;
+}
+
+.input:focus {
+  outline: none;
+  border: 1px solid var(--accent-color);
+}
+
+.input:disabled {
+  background: var(--disabled-input-color);
+}

@@ -1,0 +1,10 @@
+:root {
+  --accent-color: #FF5555;
+  --inner-border-color: #D9D9D9;
+  --default-color: #000;
+  --hint-color: #7E7E7E;
+  --link-hover-color: #208FBF;
+  --disabled-input-color: #F9F9F9;
+  --disabled-btn-color: #D9D9D9;
+  --white-color: #fff;
+}
