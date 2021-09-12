@@ -6,9 +6,7 @@ import Button from "@components/Button";
 import Input from "@components/Input";
 import GitHubStore from "@store/GitHubStore";
 import { RepoItem } from "@store/GitHubStore/types";
-// eslint-disable-next-line import/order
-import { Redirect, Route, Switch, useParams } from "react-router";
-
+import { Redirect, Route, Switch } from "react-router";
 import { BrowserRouter, Link } from "react-router-dom";
 
 import ReposListPage from "../ReposListPage";
@@ -17,7 +15,7 @@ import styles from "./ReposSearchPage.module.scss";
 type ReposContext = {
   list: RepoItem[];
   isLoading: boolean;
-  load: () => void;
+  load: (page: number) => void;
 };
 
 const ReposSearchPageContext = createContext<ReposContext>({
@@ -36,22 +34,39 @@ const ReposSearchPage = () => {
   const [repos, setRepos] = useState<RepoItem[]>([]);
   const [currentInputValue, setCurrentInputValue] = useState("");
 
-  const loadingFunc = async () => {
+  const loadingFunc = async (page: number) => {
     const gitHubStore = new GitHubStore();
-    setIsLoading(true);
-    setRepos([]);
+    if (page === 1) {
+      setIsLoading(true);
+      setRepos([]);
 
-    await gitHubStore
-      .getOrganizationReposList({ org: "ktsstudio" })
-      .then((result) => result.data)
-      .then((result) => {
-        if (Array.isArray(result)) {
-          setRepos(result);
-        } else {
-          setRepos([]);
-        }
-        setIsLoading(false);
-      });
+      await gitHubStore
+        .getOrganizationReposList({ org: "ktsstudio", per_page: 10 })
+        .then((result) => result.data)
+        .then((result) => {
+          if (Array.isArray(result)) {
+            setRepos(result);
+          } else {
+            setRepos([]);
+          }
+          setIsLoading(false);
+        });
+    } else {
+      await gitHubStore
+        .getOrganizationReposList({
+          org: "ktsstudio",
+          page: page,
+          per_page: 10,
+        })
+        .then((result) => result.data)
+        .then((result) => {
+          if (Array.isArray(result)) {
+            setRepos(repos.concat(result));
+          } else {
+            setRepos(repos);
+          }
+        });
+    }
   };
 
   return (

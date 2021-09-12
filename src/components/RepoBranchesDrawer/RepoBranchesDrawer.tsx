@@ -5,7 +5,7 @@ import "antd/dist/antd.css";
 import GitHubStore from "@store/GitHubStore";
 import { BranchItem, RepoItem } from "@store/GitHubStore/types";
 import { Drawer } from "antd";
-import { useHistory, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 type RepoBranchesDrawerProps = {
   selectedRepo: RepoItem | null;
@@ -77,14 +77,10 @@ const RepoBranchesDrawer: React.FC<RepoBranchesDrawerProps> = ({
     }
   }, [visible, selectedRepo]);
 
-  const history = useHistory();
   const drawerOptions: DrawerProperies = {
     title: "Ветки",
     visible: visible,
-    onClose: () => {
-      history.push("/repos");
-      onClose();
-    },
+    onClose: () => onClose(),
   };
 
   if (branches.length && !isLoading) {

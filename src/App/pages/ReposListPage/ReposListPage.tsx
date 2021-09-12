@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import React from "react";
 
 import RepoBranchesDrawer from "@components/RepoBranchesDrawer";
 import RepoTile from "@components/RepoTile";
 import { RepoItem } from "@store/GitHubStore/types";
-import { useParams } from "react-router";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { useHistory, useParams } from "react-router";
 import { Link } from "react-router-dom";
 
 import { UseReposSearchPageContext } from "../ReposSearchPage";
@@ -19,6 +20,8 @@ const ReposListPage = () => {
   const [selectedRepo, setSelectedRepo] = useState<RepoItem | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
 
+  const currentPageNumber = useRef(1);
+
   const repoId = useParams<{ id: string }>().id;
   useEffect(() => {
     if (repoId) {
@@ -27,7 +30,8 @@ const ReposListPage = () => {
   }, [repoId]);
 
   useEffect(() => {
-    if (!context.list.length && !repoId) context.load();
+    if (!context.list.length && !repoId)
+      context.load(currentPageNumber.current++);
   }, []);
 
   const ReposList: (
@@ -55,14 +59,26 @@ const ReposListPage = () => {
     }
   };
 
+  const history = useHistory();
+
   return (
     <div>
       *ReposListPage is active*
-      <ReposList repos={context.list} isLoading={context.isLoading} />
+      <InfiniteScroll
+        next={() => {
+          context.load(currentPageNumber.current++);
+        }}
+        hasMore={true}
+        loader={<div></div>}
+        dataLength={context.list.length}
+      >
+        <ReposList repos={context.list} isLoading={context.isLoading} />
+      </InfiniteScroll>
       <RepoBranchesDrawer
         onClose={() => {
           setDrawerVisible(false);
           setSelectedRepo(null);
+          history.push("/repos");
         }}
         visible={drawerVisible}
         selectedRepo={selectedRepo}
