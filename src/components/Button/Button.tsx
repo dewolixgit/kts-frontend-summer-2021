@@ -1,23 +1,26 @@
 import React from "react";
-import "./Button.css";
+
+import styles from "./Button.module.scss";
 
 export type ButtonProps = React.PropsWithChildren<{
   onClick: (event: React.MouseEvent) => void;
-  isDisabled?: boolean;
+  disabled?: boolean;
   className?: string;
 }>;
 
 const Button: React.FunctionComponent<ButtonProps> = ({
   onClick,
-  isDisabled,
+  disabled,
   children,
   className,
 }) => {
   return (
     <button
-      className={className ? `button ${className}` : "button"}
+      className={
+        className ? `${styles.button} ${className}` : `${styles.button}`
+      }
       onClick={onClick}
-      disabled={isDisabled}
+      disabled={disabled}
     >
       {children}
     </button>

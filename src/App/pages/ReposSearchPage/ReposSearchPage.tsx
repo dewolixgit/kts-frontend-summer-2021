@@ -1,142 +1,104 @@
-import React from "react";
+import React, { createContext, useContext } from "react";
 import { useState } from "react";
 
 import SearchIcon from "@assets/SearchIcon";
 import Button from "@components/Button";
 import Input from "@components/Input";
-import RepoBranchesDrawer from "@components/RepoBranchesDrawer";
-import RepoTile from "@components/RepoTile";
 import GitHubStore from "@store/GitHubStore";
 import { RepoItem } from "@store/GitHubStore/types";
-// eslint-disable-next-line import/order
-import { log } from "@utils/log";
+import { Redirect, Route, Switch } from "react-router";
+import { BrowserRouter, Link } from "react-router-dom";
 
-import "./ReposSearchPage.css";
+import ReposListPage from "../ReposListPage";
+import styles from "./ReposSearchPage.module.scss";
 
-type ResponseStateProps = {
+type ReposContext = {
+  list: RepoItem[];
   isLoading: boolean;
-  repos: RepoItem[] | null;
-  currentInputValue: string;
-  selectedRepo: RepoItem | null;
+  load: (page: number) => void;
 };
 
+const ReposSearchPageContext = createContext<ReposContext>({
+  isLoading: false,
+  list: [],
+  load: () => {},
+});
+
+const Provider = ReposSearchPageContext.Provider;
+
+export const UseReposSearchPageContext = () =>
+  useContext(ReposSearchPageContext);
+
 const ReposSearchPage = () => {
-  const [responseState, setResponseState] = useState<ResponseStateProps>({
-    isLoading: false,
-    repos: null,
-    currentInputValue: "",
-    selectedRepo: null,
-  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [repos, setRepos] = useState<RepoItem[]>([]);
+  const [currentInputValue, setCurrentInputValue] = useState("");
 
-  const [drawerVisible, setDrawerVisible] = React.useState<boolean>(false);
-
-  const handleBtnClick = () => {};
-
-  React.useEffect(() => {
-    setResponseState({
-      isLoading: true,
-      repos: null,
-      currentInputValue: responseState.currentInputValue,
-      selectedRepo: null,
-    });
-
+  const loadingFunc = async (page: number) => {
     const gitHubStore = new GitHubStore();
-    gitHubStore
-      .getOrganizationReposList({ org: "ktsstudio" })
-      .then((result) => result.data)
-      .then((result) => {
-        if (Array.isArray(result)) {
-          setResponseState({
-            isLoading: false,
-            repos: result,
-            currentInputValue: responseState.currentInputValue,
-            selectedRepo: null,
-          });
-        } else {
-          setResponseState({
-            isLoading: false,
-            repos: [],
-            currentInputValue: responseState.currentInputValue,
-            selectedRepo: null,
-          });
-        }
-      });
-  }, [setResponseState]);
+    if (page === 1) {
+      setIsLoading(true);
+      setRepos([]);
 
-  const handleOnChange = (event: React.FormEvent<HTMLInputElement>) => {
-    setResponseState({
-      ...responseState,
-      currentInputValue: event.currentTarget.value,
-    });
-  };
-
-  const wrapperRepoTitleClick = (repo: RepoItem) => {
-    const selectedRepo = repo;
-
-    return (clickEvent: React.MouseEvent) => {
-      log(`now ${selectedRepo.name} is selected`);
-      setResponseState({
-        ...responseState,
-        selectedRepo: selectedRepo,
-      });
-
-      setDrawerVisible(true);
-    };
-  };
-
-  const onCloseHandler = () => {
-    log("onCloseHandler");
-    setDrawerVisible(false);
-  };
-
-  const ReposList: (
-    responseState: ResponseStateProps
-  ) => React.ReactElement | null = (responseState) => {
-    if (responseState.isLoading) {
-      return <div>Загрузка{log("загрузка")}</div>;
-    } else if (!responseState.repos) {
-      return <>{log("не найдено")}</>;
+      await gitHubStore
+        .getOrganizationReposList({ org: "ktsstudio", per_page: 10 })
+        .then((result) => result.data)
+        .then((result) => {
+          if (Array.isArray(result)) {
+            setRepos(result);
+          } else {
+            setRepos([]);
+          }
+          setIsLoading(false);
+        });
     } else {
-      const repos = responseState.repos;
-
-      return (
-        <div className="repo-list">
-          {repos.map((repoItem, index) => (
-            <RepoTile
-              name={repos[index].name}
-              owner={repos[index].owner}
-              stargazers_count={repos[index].stargazers_count}
-              updated_at={repos[index].updated_at}
-              key={repos[index].id}
-              onClick={wrapperRepoTitleClick(repoItem)}
-            />
-          ))}
-        </div>
-      );
+      await gitHubStore
+        .getOrganizationReposList({
+          org: "ktsstudio",
+          page: page,
+          per_page: 10,
+        })
+        .then((result) => result.data)
+        .then((result) => {
+          if (Array.isArray(result)) {
+            setRepos(repos.concat(result));
+          } else {
+            setRepos(repos);
+          }
+        });
     }
   };
 
   return (
-    <div className="repos-search-page">
-      <form className="search-form">
-        <Input
-          placeholder={"Введите название организации"}
-          value={responseState.currentInputValue}
-          onChange={handleOnChange}
-          isDisabled={responseState.isLoading}
-        />
-        <Button onClick={handleBtnClick} isDisabled={responseState.isLoading}>
-          <SearchIcon />
-        </Button>
-      </form>
+    <div className={styles["repos-search-page"]}>
+      <BrowserRouter>
+        <form className={styles["search-form"]}>
+          <Input
+            placeholder={"Введите название организации"}
+            value={currentInputValue}
+            onChange={(event) =>
+              setCurrentInputValue(event.currentTarget.value)
+            }
+            isDisabled={isLoading}
+          />
 
-      <ReposList {...responseState} />
+          <Button onClick={() => setIsLoading(true)} disabled={isLoading}>
+            <SearchIcon />
+          </Button>
+        </form>
+        <Link to="/repos">go to ReposListPage</Link>
+        <Link to="">go to ReposSearchPage</Link>
 
-      <RepoBranchesDrawer
-        selectedRepo={responseState.selectedRepo}
-        onClose={onCloseHandler}
-        visible={drawerVisible}
-      />
+        <Switch>
+          <Provider
+            value={{ isLoading: isLoading, load: loadingFunc, list: repos }}
+          >
+            <Route exact path="/repos/:id" component={ReposListPage} />
+            <Route exact path="/repos" component={ReposListPage} />
+            <Redirect to="/repos" />
+          </Provider>
+        </Switch>
+      </BrowserRouter>
     </div>
   );
 };

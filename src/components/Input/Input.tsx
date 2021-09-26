@@ -1,6 +1,6 @@
 import React from "react";
 
-import "./Input.css";
+import styles from "./Input.module.scss";
 
 type InputProps = {
   className?: string;
@@ -23,7 +23,7 @@ const Input: React.FC<InputProps> = ({
       value={value}
       placeholder={placeholder}
       onChange={onChange}
-      className={className ? `input ${className}` : "input"}
+      className={className ? `${styles.input} ${className}` : `${styles.input}`}
       disabled={isDisabled}
     />
   );

@@ -36,7 +36,7 @@ export type RepoItem = {
   stargazers_count: number;
   updated_at: string; //или лучше передавать как тип Date??
   owner: RepoOwner;
-  id?: number;
+  id: number;
 };
 
 export type ApiBranchesResponse =

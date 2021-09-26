@@ -1,0 +1,21 @@
+@import "@components/variables.scss";
+
+.input {
+  border: 1px solid $inner-border-color;
+  border-radius: 6px;
+  width: 295px;
+  padding-left: 12px;
+
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 16px;
+
+  &:focus {
+    outline: none;
+    border: 1px solid $accent-color;
+  }
+
+  &:disabled {
+    background: $disabled-input-color;
+  }
+}
