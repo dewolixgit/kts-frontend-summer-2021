@@ -4,7 +4,6 @@ import {
   normalizeRepoItem,
   RepoItemApi,
   RepoItemModel,
-  RepoOwnerModel,
 } from "@store/models/gitHub";
 import { Meta } from "@utils/meta";
 import { ILocalStore } from "@utils/useLocalStore";
@@ -30,7 +29,7 @@ export default class RepoItemStore implements IRepoItemStore, ILocalStore {
   constructor() {
     makeObservable<RepoItemStore, PrivateFields>(this, {
       _meta: observable,
-      _repoItem: observable, //нужен ли ref
+      _repoItem: observable,
       requestRepoItem: action,
       setRepoItem: action,
       meta: computed,

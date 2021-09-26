@@ -3,7 +3,6 @@ import React from "react";
 import StarIcon from "@assets/StarIcon";
 import Avatar from "@components/Avatar";
 import { RepoItemModel } from "@store/models/gitHub";
-import { log } from "@utils/log";
 import { observer } from "mobx-react-lite";
 
 import styles from "./RepoTile.module.scss";

@@ -62,7 +62,6 @@ export default class RepoBranchesStore
   }
 
   async getRepoBranches(repo: RepoItemModel): Promise<void> {
-    log("go to get repo branches func");
     this._meta = Meta.loading;
     this._branches = getInitialCollectionModel();
 
@@ -78,7 +77,6 @@ export default class RepoBranchesStore
     );
 
     runInAction(() => {
-      log(responce.data);
       if (responce.success) {
         try {
           this._meta = Meta.success;

@@ -7,7 +7,7 @@ import {
 export type RepoItemApi = {
   name: string;
   stargazers_count: number;
-  updated_at: string; //или лучше передавать как тип Date??
+  updated_at: string;
   owner: RepoOwnerApi;
   id: number;
 };
@@ -15,7 +15,7 @@ export type RepoItemApi = {
 export type RepoItemModel = {
   name: string;
   stargazersCount: number;
-  updatedAt: string; //или лучше передавать как тип Date??
+  updatedAt: string;
   owner: RepoOwnerModel;
   id: number;
 };

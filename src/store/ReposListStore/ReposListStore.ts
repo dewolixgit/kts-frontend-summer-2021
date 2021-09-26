@@ -7,30 +7,22 @@ import {
   concatCollections,
   CollectionModel,
   getInitialCollectionModel,
-  normilizeCollection,
   normilizeElementsAndCollection,
   linearizeCollection,
 } from "@store/models/shared/collection";
-import rootStore from "@store/RootStore";
 import { log } from "@utils/log";
 import { Meta } from "@utils/meta";
 import { ILocalStore } from "@utils/useLocalStore";
 import {
   action,
   computed,
-  IReactionDisposer,
   makeObservable,
   observable,
-  reaction,
   runInAction,
 } from "mobx";
 
 import ApiStore from "../../shared/store/ApiStore";
-import {
-  ApiResponse,
-  HTTPMethod,
-  RequestParams,
-} from "../../shared/store/ApiStore/types";
+import { HTTPMethod, RequestParams } from "../../shared/store/ApiStore/types";
 import {
   IReposListStore,
   GetOrganizationReposListParams,
@@ -50,7 +42,7 @@ export default class ReposListStore implements IReposListStore, ILocalStore {
 
   constructor() {
     makeObservable<ReposListStore, PrivateFields>(this, {
-      _repos: observable, //не удалится ли бесконечный скрол?
+      _repos: observable,
       _meta: observable,
       repos: computed,
       meta: computed,
@@ -73,7 +65,6 @@ export default class ReposListStore implements IReposListStore, ILocalStore {
   async getOrganizationReposList(
     params: GetOrganizationReposListParams
   ): Promise<void> {
-    // log("response");
     this._meta = Meta.loading;
     this._repos =
       params.page && params.page > 1
@@ -114,8 +105,6 @@ export default class ReposListStore implements IReposListStore, ILocalStore {
           );
 
           this._repos = concatCollections(this._repos, newRepos);
-
-          // log(this._repos);
         } catch (err) {
           log(err);
           this._meta = Meta.error;
@@ -130,13 +119,6 @@ export default class ReposListStore implements IReposListStore, ILocalStore {
   }
 
   destroy() {
-    this._qsReaction();
+    // nothing to do
   }
-
-  private readonly _qsReaction: IReactionDisposer = reaction(
-    () => rootStore.query.getParam("search"),
-    (search) => {
-      // log("search value change: ", search);
-    }
-  );
 }
