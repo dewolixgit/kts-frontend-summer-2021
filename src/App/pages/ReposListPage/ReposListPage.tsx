@@ -1,90 +1,170 @@
-import { useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import React from "react";
 
 import RepoBranchesDrawer from "@components/RepoBranchesDrawer";
 import RepoTile from "@components/RepoTile";
-import { RepoItem } from "@store/GitHubStore/types";
+import { Provider } from "@pages/ReposSearchPage/ReposSearchPage";
+import { RepoItemModel } from "@store/models/gitHub";
+import RepoItemStorageStore from "@store/RepoItemStorageStore";
+import RepoItemStore from "@store/RepoItemStore";
+import ReposListStore from "@store/ReposListStore";
+import { useQueryParamsStoreInit } from "@store/RootStore/hooks/useQueryParamsStoreInit";
+import { log } from "@utils/log";
+import { Meta } from "@utils/meta";
+import { toJS } from "mobx";
+import { observer, useLocalStore } from "mobx-react-lite";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useHistory, useParams } from "react-router";
 import { Link } from "react-router-dom";
 
 import { UseReposSearchPageContext } from "../ReposSearchPage";
 
+// type ReposListContext = {
+//   // repoItemStorageStore: RepoItemStorageStore | null;
+//   reposList: ReposListStore | null;
+// };
+
+// export const ReposListPageContext = createContext<ReposListContext>({
+//   // repoItemStorageStore: null,
+//   reposList: [],
+// });
+
+// const Provider = ReposListPageContext.Provider;
+
+// export const UseReposListPageContext = () => useContext(ReposListPageContext);
+
 type ReposListProps = {
-  repos: RepoItem[];
+  repos: RepoItemModel[];
   isLoading: boolean;
 };
 
 const ReposListPage = () => {
+  log("render repos list page");
+  // const context = UseReposSearchPageContext();
+  // const [selectedRepo, setSelectedRepo] = useState<RepoItemModel | null>(null);
+  const selectedRepo = useLocalStore(() => new RepoItemStorageStore());
+  // const [drawerVisible, setDrawerVisible] = useState(false);
   const context = UseReposSearchPageContext();
-  const [selectedRepo, setSelectedRepo] = useState<RepoItem | null>(null);
-  const [drawerVisible, setDrawerVisible] = useState(false);
 
   const currentPageNumber = useRef(1);
 
   const repoId = useParams<{ id: string }>().id;
-  useEffect(() => {
-    if (repoId) {
-      setDrawerVisible(true);
-    }
-  }, [repoId]);
+  // useEffect(() => {
+  //   if (repoId) {
+  //     setDrawerVisible(true);
+  //   }
+  // }, [repoId]);
 
-  useEffect(() => {
-    if (!context.list.length && !repoId)
-      context.load(currentPageNumber.current++);
-  }, []);
+  // useEffect(() => {
+  //   setSelectedRepo(context.list[0]);
+  //   log(toJS(selectedRepo), "now is selected is useef");
+  // }, []);
 
-  const ReposList: (
-    reposListProps: ReposListProps
-  ) => React.ReactElement | null = ({ repos, isLoading }) => {
-    if (isLoading) {
-      return <div>Загрузка</div>;
-    } else {
-      return (
-        <div className="repo-list">
-          {repos.map((repoItem) => (
-            <Link to={`/repos/${repoItem.id}`} key={repoItem.id}>
-              <RepoTile
-                name={repoItem.name}
-                owner={repoItem.owner}
-                stargazers_count={repoItem.stargazers_count}
-                updated_at={repoItem.updated_at}
-                id={repoItem.id}
-                onClick={() => setSelectedRepo(repoItem)}
-              />
-            </Link>
-          ))}
-        </div>
-      );
-    }
-  };
+  // useEffect(() => {
+  //   log(drawerVisible, "draw vis");
+  // }, [drawerVisible]);
+
+  // useEffect(() => {
+  //   if (!context.reposListStore?.repos.length && !repoId)
+  //     context.reposListStore?.getOrganizationReposList({
+  //       org: "ktsstudio",
+  //       page: currentPageNumber.current++,
+  //     });
+  // }, []);
+
+  useEffect(
+    () => log("selected repo now is", selectedRepo.repoItem),
+    [selectedRepo.repoItem]
+  );
+
+  // const ReposList: (
+  //   reposListProps: ReposListProps
+  // ) => React.ReactElement | null = ({ repos, isLoading }) => {
+  //   if (isLoading) {
+  //     return <div>Загрузка</div>;
+  //   } else {
+  //     return (
+  //       <div className="repo-list">
+  //         {repos.map((repoItem) => (
+  //           <Link to={`/repos/${repoItem.id}`} key={repoItem.id}>
+  //             <RepoTile
+  //               name={repoItem.name}
+  //               owner={repoItem.owner}
+  //               stargazersCount={repoItem.stargazersCount}
+  //               updatedAt={repoItem.updatedAt}
+  //               id={repoItem.id}
+  //               onClick={() => {
+  //                 setSelectedRepo(repoItem);
+  //               }}
+  //             />
+  //           </Link>
+  //         ))}
+  //       </div>
+  //     );
+  //   }
+  // };
 
   const history = useHistory();
 
   return (
     <div>
-      *ReposListPage is active*
-      <InfiniteScroll
-        next={() => {
-          context.load(currentPageNumber.current++);
+      <Provider
+        value={{
+          reposListStore: context.reposListStore,
+          inputStore: context.inputStore,
         }}
-        hasMore={true}
-        loader={<div></div>}
-        dataLength={context.list.length}
       >
-        <ReposList repos={context.list} isLoading={context.isLoading} />
-      </InfiniteScroll>
-      <RepoBranchesDrawer
-        onClose={() => {
-          setDrawerVisible(false);
-          setSelectedRepo(null);
-          history.push("/repos");
-        }}
-        visible={drawerVisible}
-        selectedRepo={selectedRepo}
-      />
+        *ReposListPage is active*
+        {context.reposListStore?.meta === Meta.loading && <div>loading</div>}
+        {context.reposListStore?.meta !== Meta.loading &&
+          context.reposListStore?.repos && (
+            <InfiniteScroll
+              next={() => {
+                context.reposListStore?.getOrganizationReposList({
+                  page: currentPageNumber.current++,
+                  org: context.inputStore?.currentValue
+                    ? context.inputStore?.currentValue
+                    : "",
+                });
+              }}
+              hasMore={true}
+              loader={<div></div>}
+              dataLength={context.reposListStore?.repos.length}
+            >
+              {/* <ReposList repos={context.list} isLoading={context.isLoading} /> */}
+              <div className="repo-list">
+                {context.reposListStore.repos.map((repoItem) => (
+                  <Link to={`/repos/${repoItem.id}`} key={repoItem.id}>
+                    <RepoTile
+                      name={repoItem.name}
+                      owner={repoItem.owner}
+                      stargazersCount={repoItem.stargazersCount}
+                      updatedAt={repoItem.updatedAt}
+                      id={repoItem.id}
+                      onClick={() => {
+                        // setSelectedRepo(context.list[0]);
+                        // log("in onclick", selectedRepo.repoItem);
+                        // selectedRepo.setRepoItem(repoItem);
+                      }}
+                    />
+                  </Link>
+                ))}
+              </div>
+            </InfiniteScroll>
+          )}
+        <RepoBranchesDrawer
+          onClose={() => {
+            log("closing of drawer");
+            // setDrawerVisible(false);
+            // setSelectedRepo(null);
+            // selectedRepo.setRepoItem(null);
+            history.push("/repos");
+          }}
+          // visible={repoId ? true : false}
+        />
+      </Provider>
     </div>
   );
 };
 
-export default ReposListPage;
+export default observer(ReposListPage);

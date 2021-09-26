@@ -1,16 +1,31 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import React from "react";
 import "antd/dist/antd.css";
 
-import GitHubStore from "@store/GitHubStore";
-import { BranchItem, RepoItem } from "@store/GitHubStore/types";
+// import { UseReposListPageContext } from "@pages/ReposListPage/ReposListPage";
+// import { ReposListPageContext } from "@pages/ReposListPage/ReposListPage";
+import { UseReposSearchPageContext } from "@pages/ReposSearchPage";
+import {
+  normalizeRepoItem,
+  RepoItemApi,
+  RepoItemModel,
+} from "@store/models/gitHub";
+import {
+  BranchItemModel,
+  normalizeBranchItem,
+} from "@store/models/gitHub/branchItem";
+import RepoBranchesStore from "@store/RepoBranchesStore/RepoBranchesStore";
+import RepoItemStore from "@store/RepoItemStore";
+import GitHubStore from "@store/ReposListStore";
+import { log } from "@utils/log";
+import { Meta } from "@utils/meta";
 import { Drawer } from "antd";
+import { observer, useLocalStore } from "mobx-react-lite";
 import { useParams } from "react-router-dom";
 
 type RepoBranchesDrawerProps = {
-  selectedRepo: RepoItem | null;
   onClose: () => void;
-  visible: boolean;
+  // visible: boolean;
 };
 
 type DrawerProperies = {
@@ -21,77 +36,71 @@ type DrawerProperies = {
 
 const RepoBranchesDrawer: React.FC<RepoBranchesDrawerProps> = ({
   onClose,
-  selectedRepo,
-  visible,
+  // visible,
 }) => {
-  const [branches, setBranches] = useState<BranchItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [targetRepo, setTargetRepo] = useState<RepoItem | null>(selectedRepo);
+  // const [branches, setBranches] = useState<BranchItemModel[]>([]);
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [targetRepo, setTargetRepo] = useState<RepoItemModel | null>( //пофиксить на модель
+  //   selectedRepo
+  // );
+  // const context = useContext(ReposListPageContext);
+  // const context = UseReposListPageContext();
+  const context = UseReposSearchPageContext();
+
+  const repoBranchesStore = useLocalStore(() => new RepoBranchesStore());
+  const repoItemStore = useLocalStore(() => new RepoItemStore());
 
   const repoId = useParams<{ id?: string }>().id;
 
   let branchCounterId = 0;
 
   useEffect(() => {
-    const gitHubStore = new GitHubStore();
-
-    if (selectedRepo) {
-      setIsLoading(visible);
-
-      gitHubStore
-        .getRepoBranches({
-          repo: selectedRepo,
-          owner: selectedRepo.owner.login,
-        })
-        .then((branches) => {
-          if (branches) {
-            setBranches(branches.data);
-            setIsLoading(false);
-          }
-        });
-    } else if (!selectedRepo && repoId) {
-      setIsLoading(true);
-
-      gitHubStore
-        .getRepoById(repoId)
-        .then((response) => {
-          if (response.success) {
-            return response.data;
-          }
-        })
-        .then((repo) => {
-          if (repo) {
-            setTargetRepo(repo);
-            return gitHubStore.getRepoBranches({
-              owner: repo.owner.login,
-              repo: repo,
-            });
-          }
-        })
-        .then((branchesReponse) => {
-          if (branchesReponse && branchesReponse.success) {
-            setBranches(branchesReponse.data);
-            setIsLoading(false);
-          }
-        });
+    // if (context.repoItemStorageStore?.repoItem) {
+    //   repoBranchesStore.getRepoBranches(context.repoItemStorageStore?.repoItem);
+    // } else if (!context.repoItemStorageStore?.repoItem && repoId) {
+    //   repoItemStore.getRepoItem(repoId);
+    //   if (
+    //     repoItemStore.repoItem !== null &&
+    //     repoItemStore.meta === Meta.success
+    //   ) {
+    //     repoBranchesStore.getRepoBranches(repoItemStore.repoItem);
+    //   }
+    // }
+    if (context.reposListStore?.repos.length && repoId) {
+      const targetRepo: RepoItemModel =
+        context.reposListStore.getRepoCollection().entities[parseInt(repoId)];
+      repoBranchesStore.getRepoBranches(targetRepo);
+      repoItemStore.setRepoItem(targetRepo);
+    } else if (!context.reposListStore?.repos.length && repoId) {
+      repoItemStore.requestRepoItem(repoId);
+      if (
+        repoItemStore.repoItem !== null &&
+        repoItemStore.meta === Meta.success
+      ) {
+        repoBranchesStore.getRepoBranches(repoItemStore.repoItem);
+        repoItemStore.setRepoItem(repoItemStore.repoItem);
+      }
     }
-  }, [visible, selectedRepo]);
+  }, []);
 
   const drawerOptions: DrawerProperies = {
     title: "Ветки",
-    visible: visible,
+    visible: repoId ? true : false,
     onClose: () => onClose(),
   };
 
-  if (branches.length && !isLoading) {
+  if (
+    repoBranchesStore.branches.length &&
+    !(repoBranchesStore.meta === Meta.loading)
+  ) {
     return (
       <Drawer {...drawerOptions}>
         <ul>
-          {branches.map((branchItem) => {
+          {repoBranchesStore.branches.map((branchItem) => {
             return <li key={branchCounterId++}>{branchItem.name}</li>;
           })}
         </ul>
-        Id репозитория: {targetRepo?.id}
+        Id репозитория: {repoItemStore.repoItem?.id}
       </Drawer>
     );
   }
@@ -99,4 +108,4 @@ const RepoBranchesDrawer: React.FC<RepoBranchesDrawerProps> = ({
   return <Drawer {...drawerOptions}></Drawer>;
 };
 
-export default RepoBranchesDrawer;
+export default observer(RepoBranchesDrawer);

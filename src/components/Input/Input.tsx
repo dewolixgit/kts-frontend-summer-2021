@@ -1,5 +1,7 @@
 import React from "react";
 
+import { useQueryParamsStoreInit } from "@store/RootStore/hooks/useQueryParamsStoreInit";
+
 import styles from "./Input.module.scss";
 
 type InputProps = {

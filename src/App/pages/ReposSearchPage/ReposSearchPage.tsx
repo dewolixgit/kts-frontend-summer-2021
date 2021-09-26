@@ -4,103 +4,95 @@ import { useState } from "react";
 import SearchIcon from "@assets/SearchIcon";
 import Button from "@components/Button";
 import Input from "@components/Input";
-import GitHubStore from "@store/GitHubStore";
-import { RepoItem } from "@store/GitHubStore/types";
-import { Redirect, Route, Switch } from "react-router";
+import InputStore from "@store/Input/InputStore";
+import { RepoItemModel } from "@store/models/gitHub";
+import { CollectionModel } from "@store/models/shared/collection";
+import GitHubStore from "@store/ReposListStore";
+import ReposListStore from "@store/ReposListStore";
+import { useQueryParamsStoreInit } from "@store/RootStore/hooks/useQueryParamsStoreInit";
+import rootStore from "@store/RootStore/instance";
+import { log } from "@utils/log";
+import { Meta } from "@utils/meta";
+import { useLocalStore } from "@utils/useLocalStore";
+import { toJS } from "mobx";
+import { observer } from "mobx-react-lite";
+import { Redirect, Route, Switch, useHistory } from "react-router";
 import { BrowserRouter, Link } from "react-router-dom";
 
 import ReposListPage from "../ReposListPage";
 import styles from "./ReposSearchPage.module.scss";
 
 type ReposContext = {
-  list: RepoItem[];
-  isLoading: boolean;
-  load: (page: number) => void;
+  reposListStore: ReposListStore | null;
+  inputStore: InputStore | null;
 };
 
 const ReposSearchPageContext = createContext<ReposContext>({
-  isLoading: false,
-  list: [],
-  load: () => {},
+  reposListStore: null,
+  inputStore: null,
 });
 
-const Provider = ReposSearchPageContext.Provider;
+export const Provider = ReposSearchPageContext.Provider;
 
 export const UseReposSearchPageContext = () =>
   useContext(ReposSearchPageContext);
 
 const ReposSearchPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [repos, setRepos] = useState<RepoItem[]>([]);
-  const [currentInputValue, setCurrentInputValue] = useState("");
+  const reposListStore = useLocalStore(() => new GitHubStore());
+  // const [currentInputValue, setCurrentInputValue] = useState("");
+  const inputStore = useLocalStore(() => new InputStore());
 
-  const loadingFunc = async (page: number) => {
-    const gitHubStore = new GitHubStore();
-    if (page === 1) {
-      setIsLoading(true);
-      setRepos([]);
+  useQueryParamsStoreInit();
 
-      await gitHubStore
-        .getOrganizationReposList({ org: "ktsstudio", per_page: 10 })
-        .then((result) => result.data)
-        .then((result) => {
-          if (Array.isArray(result)) {
-            setRepos(result);
-          } else {
-            setRepos([]);
-          }
-          setIsLoading(false);
-        });
-    } else {
-      await gitHubStore
-        .getOrganizationReposList({
-          org: "ktsstudio",
-          page: page,
-          per_page: 10,
-        })
-        .then((result) => result.data)
-        .then((result) => {
-          if (Array.isArray(result)) {
-            setRepos(repos.concat(result));
-          } else {
-            setRepos(repos);
-          }
-        });
-    }
+  // log("reposSearchPage", toJS(gitHubStore.repos), toJS(gitHubStore.meta));
+
+  const loadingFunc = async (orgName: string | undefined, page: number) => {
+    await reposListStore.getOrganizationReposList({
+      org: orgName ? orgName : "",
+      page: page,
+      per_page: 10,
+    });
   };
+
+  const history = useHistory();
 
   return (
     <div className={styles["repos-search-page"]}>
-      <BrowserRouter>
-        <form className={styles["search-form"]}>
-          <Input
-            placeholder={"Введите название организации"}
-            value={currentInputValue}
-            onChange={(event) =>
-              setCurrentInputValue(event.currentTarget.value)
-            }
-            isDisabled={isLoading}
-          />
+      <form className={styles["search-form"]}>
+        <Input
+          placeholder={"Введите название организации"}
+          value={inputStore.currentValue}
+          onChange={(event) => {
+            inputStore.setInputValue(event.currentTarget.value);
+            history.push(`?search=${inputStore.currentValue}`);
+          }}
+          isDisabled={reposListStore.meta === Meta.loading}
+        />
 
-          <Button onClick={() => setIsLoading(true)} disabled={isLoading}>
-            <SearchIcon />
-          </Button>
-        </form>
-        <Link to="/repos">go to ReposListPage</Link>
-        <Link to="">go to ReposSearchPage</Link>
+        <Button
+          onClick={() => loadingFunc(inputStore.currentValue, 1)}
+          disabled={reposListStore.meta === Meta.loading}
+        >
+          <SearchIcon />
+        </Button>
+      </form>
+      <Link to="/repos">go to ReposListPage</Link>
+      <Link to="">go to ReposSearchPage</Link>
 
-        <Switch>
-          <Provider
-            value={{ isLoading: isLoading, load: loadingFunc, list: repos }}
-          >
-            <Route exact path="/repos/:id" component={ReposListPage} />
-            <Route exact path="/repos" component={ReposListPage} />
-            <Redirect to="/repos" />
-          </Provider>
-        </Switch>
-      </BrowserRouter>
+      <Switch>
+        <Provider
+          value={{
+            reposListStore: reposListStore,
+            inputStore: inputStore,
+          }}
+        >
+          <Route exact path="/repos/:id" component={ReposListPage} />
+          <Route exact path="/repos" component={ReposListPage} />
+          <Redirect to="/repos" />
+        </Provider>
+      </Switch>
     </div>
   );
 };
 
-export default ReposSearchPage;
+export default observer(ReposSearchPage);
