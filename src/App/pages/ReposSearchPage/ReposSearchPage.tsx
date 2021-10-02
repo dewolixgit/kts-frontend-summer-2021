@@ -1,16 +1,16 @@
 import React, { createContext, useContext } from "react";
 
-import SearchIcon from "@assets/SearchIcon";
-import Button from "@components/Button";
-import Input from "@components/Input";
-import CurrentPageNumberStore from "@store/CurrentPageNumberStore";
-import InputStore from "@store/Input/InputStore";
-import RepoOwnerStore from "@store/RepoOwnerStore";
-import GitHubStore from "@store/ReposListStore";
-import ReposListStore from "@store/ReposListStore";
-import { useQueryParamsStoreInit } from "@store/RootStore/hooks/useQueryParamsStoreInit";
-import { Meta } from "@utils/meta";
-import { useLocalStore } from "@utils/useLocalStore";
+import SearchIcon from "assets/SearchIcon/SearchIcon";
+import Button from "components/Button/Button";
+import Input from "components/Input/Input";
+import CurrentPageNumberStore from "store/CurrentPageNumberStore";
+import InputStore from "store/Input/InputStore";
+import RepoOwnerStore from "store/RepoOwnerStore";
+import GitHubStore from "store/ReposListStore";
+import ReposListStore from "store/ReposListStore";
+import { useQueryParamsStoreInit } from "store/RootStore/hooks/useQueryParamsStoreInit";
+import { Meta } from "utils/meta";
+import { useLocalStore } from "utils/useLocalStore";
 import { observer } from "mobx-react-lite";
 import { Redirect, Route, Switch, useHistory } from "react-router";
 

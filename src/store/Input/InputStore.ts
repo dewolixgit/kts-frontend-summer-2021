@@ -1,4 +1,4 @@
-import { ILocalStore } from "@utils/useLocalStore";
+import { ILocalStore } from "utils/useLocalStore";
 import { action, computed, makeObservable, observable } from "mobx";
 import { useHistory } from "react-router";
 

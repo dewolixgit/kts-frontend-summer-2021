@@ -2,11 +2,11 @@ import { useEffect } from "react";
 import React from "react";
 import "antd/dist/antd.css";
 
-import { UseReposSearchPageContext } from "@pages/ReposSearchPage";
-import { RepoItemModel } from "@store/models/gitHub";
-import RepoBranchesStore from "@store/RepoBranchesStore/RepoBranchesStore";
-import RepoItemStore from "@store/RepoItemStore";
-import { Meta } from "@utils/meta";
+import { UseReposSearchPageContext } from "pages/ReposSearchPage";
+import { RepoItemModel } from "store/models/gitHub";
+import RepoBranchesStore from "store/RepoBranchesStore/RepoBranchesStore";
+import RepoItemStore from "store/RepoItemStore";
+import { Meta } from "utils/meta";
 import { Drawer } from "antd";
 import { observer, useLocalStore } from "mobx-react-lite";
 import { useParams } from "react-router-dom";

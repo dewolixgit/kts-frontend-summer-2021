@@ -1,25 +1,25 @@
-import ApiStore from "@shared/store/ApiStore";
+import ApiStore from "shared/store/ApiStore";
 import {
   ApiResponse,
   HTTPMethod,
   RequestParams,
-} from "@shared/store/ApiStore/types";
+} from "shared/store/ApiStore/types";
 import {
   BranchItemApi,
   BranchItemModel,
   normalizeBranchItem,
   RepoItemModel,
-} from "@store/models/gitHub";
+} from "store/models/gitHub";
 import {
   CollectionModel,
   getInitialCollectionModel,
   linearizeCollection,
   normilizeElementsAndCollection,
-} from "@store/models/shared/collection";
-import {} from "@store/ReposListStore/types";
-import { log } from "@utils/log";
-import { Meta } from "@utils/meta";
-import { ILocalStore } from "@utils/useLocalStore";
+} from "store/models/shared/collection";
+import { } from "store/ReposListStore/types";
+import { log } from "utils/log";
+import { Meta } from "utils/meta";
+import { ILocalStore } from "utils/useLocalStore";
 import {
   action,
   computed,
@@ -35,8 +35,7 @@ type PrivateFields = "_branches" | "_meta";
 const BASE_URL = "https://api.github.com";
 
 export default class RepoBranchesStore
-  implements IRepoBranchesStore, ILocalStore
-{
+  implements IRepoBranchesStore, ILocalStore {
   private _apiStore = new ApiStore(BASE_URL);
 
   private _branches: CollectionModel<string, BranchItemModel> =

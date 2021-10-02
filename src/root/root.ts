@@ -1,5 +1,5 @@
 // import { RepoItem } from "@store/GitHubStore/types";
-import { log } from "@utils/log";
+import { log } from "utils/log";
 
 // import GitHubStore from "../store/GitHubStore/GitHubStore";
 
