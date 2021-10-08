@@ -33,7 +33,7 @@ const ReposSearchPageContext = createContext<ReposContext>({
 
 export const Provider = ReposSearchPageContext.Provider;
 
-export const UseReposSearchPageContext = () =>
+export const UseReposSearchPageContext = (): ReposContext =>
   useContext(ReposSearchPageContext);
 
 const ReposSearchPage = () => {

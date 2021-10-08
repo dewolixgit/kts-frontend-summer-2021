@@ -5,7 +5,7 @@ import { useHistory } from "react-router";
 type PrivateFields = "_currentValue";
 
 export default class InputStore implements ILocalStore {
-  private _currentValue: string = "";
+  private _currentValue = "";
 
   constructor() {
     makeObservable<InputStore, PrivateFields>(this, {
@@ -23,7 +23,7 @@ export default class InputStore implements ILocalStore {
     this._currentValue = value;
   }
 
-  destroy() {
+  destroy(): void {
     // nothing to do
   }
 }

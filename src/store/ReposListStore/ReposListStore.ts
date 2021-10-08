@@ -76,18 +76,18 @@ export default class ReposListStore implements IReposListStore, ILocalStore {
       : {};
 
     const paramsToRequest: RequestParams<GetOrganizationReposListParamsForQueryStr> =
-    {
-      method: HTTPMethod.GET,
-      headers: headersObj,
-      endpoint: `/orgs/${params.org}/repos`,
-      data: {
-        type: params.type,
-        sort: params.sort,
-        per_page: params.per_page,
-        page: params.page,
-        direction: params.direction,
-      },
-    };
+      {
+        method: HTTPMethod.GET,
+        headers: headersObj,
+        endpoint: `/orgs/${params.org}/repos`,
+        data: {
+          type: params.type,
+          sort: params.sort,
+          per_page: params.per_page,
+          page: params.page,
+          direction: params.direction,
+        },
+      };
 
     const response = await this._apiStore.request<RepoItemApi[]>(
       paramsToRequest
@@ -118,7 +118,7 @@ export default class ReposListStore implements IReposListStore, ILocalStore {
     });
   }
 
-  destroy() {
+  destroy(): void {
     // nothing to do
   }
 }

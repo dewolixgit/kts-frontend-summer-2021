@@ -45,7 +45,7 @@ export default class RepoOwnerStore implements IRepoOwnerStore, ILocalStore {
     return this._meta;
   }
 
-  async getRepoOwnerInfo(login: string) {
+  async getRepoOwnerInfo(login: string): Promise<void> {
     this._owner = null;
     this._meta = Meta.loading;
 
@@ -78,7 +78,7 @@ export default class RepoOwnerStore implements IRepoOwnerStore, ILocalStore {
     });
   }
 
-  destroy() {
+  destroy(): void {
     // nothing to do
   }
 }

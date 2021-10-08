@@ -45,11 +45,11 @@ export default class RepoItemStore implements IRepoItemStore, ILocalStore {
     return this._repoItem;
   }
 
-  setRepoItem(repoItem: RepoItemModel) {
+  setRepoItem(repoItem: RepoItemModel): void {
     this._repoItem = repoItem;
   }
 
-  async requestRepoItem(id: string) {
+  async requestRepoItem(id: string): Promise<void> {
     this._repoItem = null;
     this._meta = Meta.loading;
 
@@ -80,7 +80,7 @@ export default class RepoItemStore implements IRepoItemStore, ILocalStore {
     });
   }
 
-  destroy() {
+  destroy(): void {
     //nothing
   }
 }

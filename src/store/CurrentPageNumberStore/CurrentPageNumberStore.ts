@@ -4,7 +4,7 @@ import { action, computed, makeObservable, observable } from "mobx";
 type PrivateFields = "_current";
 
 export default class CurrentPageNumber implements ILocalStore {
-  private _current: number = 1;
+  private _current = 1;
 
   constructor() {
     makeObservable<CurrentPageNumber, PrivateFields>(this, {
@@ -19,15 +19,15 @@ export default class CurrentPageNumber implements ILocalStore {
     return this._current;
   }
 
-  increment() {
+  increment(): void {
     this._current++;
   }
 
-  reset() {
+  reset(): void {
     this._current = 1;
   }
 
-  destroy() {
+  destroy(): void {
     // nothing to do
   }
 }

@@ -16,7 +16,7 @@ import {
   linearizeCollection,
   normilizeElementsAndCollection,
 } from "store/models/shared/collection";
-import { } from "store/ReposListStore/types";
+import {} from "store/ReposListStore/types";
 import { log } from "utils/log";
 import { Meta } from "utils/meta";
 import { ILocalStore } from "utils/useLocalStore";
@@ -35,7 +35,8 @@ type PrivateFields = "_branches" | "_meta";
 const BASE_URL = "https://api.github.com";
 
 export default class RepoBranchesStore
-  implements IRepoBranchesStore, ILocalStore {
+  implements IRepoBranchesStore, ILocalStore
+{
   private _apiStore = new ApiStore(BASE_URL);
 
   private _branches: CollectionModel<string, BranchItemModel> =
@@ -98,7 +99,7 @@ export default class RepoBranchesStore
     });
   }
 
-  destroy() {
+  destroy(): void {
     //nothing to do
   }
 }

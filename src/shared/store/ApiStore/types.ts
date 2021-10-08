@@ -46,6 +46,7 @@ export type ApiResponse<SuccessT, ErrorT> =
 export interface IApiStore {
   readonly baseUrl: string;
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   request<SuccessT, ErrorT = any, ReqT = {}>(
     params: RequestParams<ReqT>
   ): Promise<ApiResponse<SuccessT, ErrorT>>;

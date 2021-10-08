@@ -5,7 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import "./App.scss";
 import ReposSearchPage from "pages/ReposSearchPage";
 
-const App = () => {
+const App = (): React.ReactElement => {
   return (
     <>
       <BrowserRouter>

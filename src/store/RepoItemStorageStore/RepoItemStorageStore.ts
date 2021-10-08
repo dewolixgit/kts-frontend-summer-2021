@@ -14,11 +14,11 @@ export default class RepoItemStorageStore {
     });
   }
 
-  get repoItem() {
+  get repoItem(): RepoItemModel | null {
     return this._repoItem;
   }
 
-  setRepoItem(newRepoItem: RepoItemModel | null) {
+  setRepoItem(newRepoItem: RepoItemModel | null): void {
     this._repoItem = newRepoItem;
   }
 }

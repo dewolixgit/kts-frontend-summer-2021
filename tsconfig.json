@@ -11,6 +11,9 @@
       "shared/*": ["shared/*"],
       "pages/*": ["App/pages/*"]
     },
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
     "noEmit": true,
     "allowJs": true,
     "sourceMap": true,

@@ -48,7 +48,7 @@ export const normilizeElementsAndCollection = <
 export const concatCollections = <Key extends string | number, T>(
   currentCollection: CollectionModel<Key, T>,
   additioalCollection: CollectionModel<Key, T>
-) => {
+): CollectionModel<Key, T> => {
   const resultOrder: Key[] = currentCollection.order.concat(
     additioalCollection.order
   );
