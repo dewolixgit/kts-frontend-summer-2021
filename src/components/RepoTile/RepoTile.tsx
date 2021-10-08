@@ -2,7 +2,8 @@ import React from "react";
 
 import StarIcon from "@assets/StarIcon";
 import Avatar from "@components/Avatar";
-import { RepoItem } from "src/store/GitHubStore/types";
+import { RepoItemModel } from "@store/models/gitHub";
+import { observer } from "mobx-react-lite";
 
 import styles from "./RepoTile.module.scss";
 
@@ -10,10 +11,10 @@ type ClickHandler = {
   onClick?: (event: React.MouseEvent) => void;
 };
 
-const RepoTile: React.FC<RepoItem & ClickHandler> = ({
+const RepoTile: React.FC<RepoItemModel & ClickHandler> = ({
   name,
-  stargazers_count,
-  updated_at,
+  stargazersCount,
+  updatedAt,
   owner,
   id,
   onClick,
@@ -35,10 +36,10 @@ const RepoTile: React.FC<RepoItem & ClickHandler> = ({
         <div className={styles["repo-tile__data"]}>
           <div className={styles["repo-tile__rating"]}>
             <StarIcon className={styles["repo-tile__rating-star"]} />{" "}
-            {stargazers_count}
+            {stargazersCount}
           </div>
           <div className={styles["repo-tile__update-date"]}>
-            Updated at {updated_at.slice(0, 10)}
+            Updated at {updatedAt.slice(0, 10)}
           </div>
         </div>
       </div>
@@ -46,4 +47,4 @@ const RepoTile: React.FC<RepoItem & ClickHandler> = ({
   );
 };
 
-export default React.memo(RepoTile);
+export default observer(RepoTile);

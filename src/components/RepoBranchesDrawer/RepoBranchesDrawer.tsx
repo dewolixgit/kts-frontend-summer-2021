@@ -1,16 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import React from "react";
 import "antd/dist/antd.css";
 
-import GitHubStore from "@store/GitHubStore";
-import { BranchItem, RepoItem } from "@store/GitHubStore/types";
+import { UseReposSearchPageContext } from "@pages/ReposSearchPage";
+import { RepoItemModel } from "@store/models/gitHub";
+import RepoBranchesStore from "@store/RepoBranchesStore/RepoBranchesStore";
+import RepoItemStore from "@store/RepoItemStore";
+import { Meta } from "@utils/meta";
 import { Drawer } from "antd";
+import { observer, useLocalStore } from "mobx-react-lite";
 import { useParams } from "react-router-dom";
 
 type RepoBranchesDrawerProps = {
-  selectedRepo: RepoItem | null;
   onClose: () => void;
-  visible: boolean;
+  // visible: boolean;
 };
 
 type DrawerProperies = {
@@ -19,84 +22,58 @@ type DrawerProperies = {
   visible: boolean;
 };
 
-const RepoBranchesDrawer: React.FC<RepoBranchesDrawerProps> = ({
-  onClose,
-  selectedRepo,
-  visible,
-}) => {
-  const [branches, setBranches] = useState<BranchItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [targetRepo, setTargetRepo] = useState<RepoItem | null>(selectedRepo);
+const RepoBranchesDrawer: React.FC<RepoBranchesDrawerProps> = ({ onClose }) => {
+  const context = UseReposSearchPageContext();
+
+  const repoBranchesStore = useLocalStore(() => new RepoBranchesStore());
+  const repoItemStore = useLocalStore(() => new RepoItemStore());
 
   const repoId = useParams<{ id?: string }>().id;
 
   let branchCounterId = 0;
 
   useEffect(() => {
-    const gitHubStore = new GitHubStore();
-
-    if (selectedRepo) {
-      setIsLoading(visible);
-
-      gitHubStore
-        .getRepoBranches({
-          repo: selectedRepo,
-          owner: selectedRepo.owner.login,
-        })
-        .then((branches) => {
-          if (branches) {
-            setBranches(branches.data);
-            setIsLoading(false);
-          }
-        });
-    } else if (!selectedRepo && repoId) {
-      setIsLoading(true);
-
-      gitHubStore
-        .getRepoById(repoId)
-        .then((response) => {
-          if (response.success) {
-            return response.data;
-          }
-        })
-        .then((repo) => {
-          if (repo) {
-            setTargetRepo(repo);
-            return gitHubStore.getRepoBranches({
-              owner: repo.owner.login,
-              repo: repo,
-            });
-          }
-        })
-        .then((branchesReponse) => {
-          if (branchesReponse && branchesReponse.success) {
-            setBranches(branchesReponse.data);
-            setIsLoading(false);
-          }
-        });
+    if (context.reposListStore?.repos.length && repoId) {
+      const targetRepo: RepoItemModel =
+        context.reposListStore.getRepoCollection().entities[parseInt(repoId)];
+      repoBranchesStore.getRepoBranches(targetRepo);
+      repoItemStore.setRepoItem(targetRepo);
+    } else if (!context.reposListStore?.repos.length && repoId) {
+      repoItemStore.requestRepoItem(repoId);
+      if (
+        repoItemStore.repoItem !== null &&
+        repoItemStore.meta === Meta.success
+      ) {
+        repoBranchesStore.getRepoBranches(repoItemStore.repoItem);
+        repoItemStore.setRepoItem(repoItemStore.repoItem);
+      }
     }
-  }, [visible, selectedRepo]);
+  }, []);
 
   const drawerOptions: DrawerProperies = {
     title: "Ветки",
-    visible: visible,
+    visible: repoId ? true : false,
     onClose: () => onClose(),
   };
 
-  if (branches.length && !isLoading) {
-    return (
-      <Drawer {...drawerOptions}>
-        <ul>
-          {branches.map((branchItem) => {
-            return <li key={branchCounterId++}>{branchItem.name}</li>;
-          })}
-        </ul>
-        Id репозитория: {targetRepo?.id}
-      </Drawer>
-    );
-  }
-
-  return <Drawer {...drawerOptions}></Drawer>;
+  return (
+    <Drawer {...drawerOptions}>
+      {repoBranchesStore.meta === Meta.loading && <div>Загрузка</div>}
+      {repoBranchesStore.meta === Meta.error && (
+        <div>Не удалось загрузить ветки</div>
+      )}
+      {repoBranchesStore.meta === Meta.success && (
+        <>
+          <ul>
+            {repoBranchesStore.branches.map((branchItem) => {
+              return <li key={branchCounterId++}>{branchItem.name}</li>;
+            })}
+          </ul>
+          Id репозитория: {repoItemStore.repoItem?.id}
+        </>
+      )}
+    </Drawer>
+  );
 };
 
-export default RepoBranchesDrawer;
+export default observer(RepoBranchesDrawer);
