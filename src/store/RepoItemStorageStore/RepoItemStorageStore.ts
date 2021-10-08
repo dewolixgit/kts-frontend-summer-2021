@@ -1,4 +1,4 @@
-import { RepoItemModel } from "@store/models/gitHub";
+import { RepoItemModel } from "store/models/gitHub";
 import { action, computed, makeObservable, observable } from "mobx";
 
 type PrivateFields = "_repoItem";

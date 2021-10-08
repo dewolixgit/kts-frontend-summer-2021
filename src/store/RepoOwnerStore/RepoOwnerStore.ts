@@ -1,12 +1,12 @@
-import ApiStore from "@shared/store/ApiStore";
-import { HTTPMethod, RequestParams } from "@shared/store/ApiStore/types";
+import ApiStore from "shared/store/ApiStore";
+import { HTTPMethod, RequestParams } from "shared/store/ApiStore/types";
 import {
   normalizeGitHubRepoOwner,
   RepoOwnerApi,
   RepoOwnerModel,
-} from "@store/models/gitHub";
-import { Meta } from "@utils/meta";
-import { ILocalStore } from "@utils/useLocalStore";
+} from "store/models/gitHub";
+import { Meta } from "utils/meta";
+import { ILocalStore } from "utils/useLocalStore";
 import {
   action,
   computed,

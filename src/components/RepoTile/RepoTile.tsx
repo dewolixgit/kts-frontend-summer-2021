@@ -1,8 +1,8 @@
 import React from "react";
 
-import StarIcon from "@assets/StarIcon";
-import Avatar from "@components/Avatar";
-import { RepoItemModel } from "@store/models/gitHub";
+import StarIcon from "assets/StarIcon";
+import Avatar from "components/Avatar";
+import { RepoItemModel } from "store/models/gitHub";
 import { observer } from "mobx-react-lite";
 
 import styles from "./RepoTile.module.scss";

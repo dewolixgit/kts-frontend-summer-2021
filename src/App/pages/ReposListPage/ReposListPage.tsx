@@ -1,15 +1,15 @@
 import React from "react";
 
-import RepoBranchesDrawer from "@components/RepoBranchesDrawer";
-import RepoTile from "@components/RepoTile";
-import { Provider } from "@pages/ReposSearchPage/ReposSearchPage";
-import { Meta } from "@utils/meta";
+import RepoBranchesDrawer from "components/RepoBranchesDrawer";
+import RepoTile from "components/RepoTile";
+import { Provider } from "../ReposSearchPage";
+import { Meta } from "utils/meta";
 import { observer } from "mobx-react-lite";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 
-import { UseReposSearchPageContext } from "../ReposSearchPage";
+import { UseReposSearchPageContext } from "pages/ReposSearchPage";
 
 const ReposListPage = () => {
   const context = UseReposSearchPageContext();

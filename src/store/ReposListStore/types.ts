@@ -1,5 +1,5 @@
-import { RepoItemApi, RepoItemModel } from "@store/models/gitHub";
-import { BranchItemApi } from "@store/models/gitHub/branchItem";
+import { RepoItemApi, RepoItemModel } from "store/models/gitHub";
+import { BranchItemApi } from "store/models/gitHub/branchItem";
 
 export type GetOrganizationReposListParams = {
   accept?: string;
@@ -22,17 +22,3 @@ export interface IReposListStore {
     params: GetOrganizationReposListParams
   ): Promise<void>;
 }
-
-// export type ApiBranchesResponse =  //// посмотреть вариант переноса apiBranchesResponse на ApiResponce
-//   | {
-//       success: true;
-//       data: BranchItemApi[];
-//     }
-//   | {
-//       success: false;
-//       data: any;
-//     };
-
-// export type BranchItem = {
-//   name: string;
-// };

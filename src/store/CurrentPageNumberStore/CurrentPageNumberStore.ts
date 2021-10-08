@@ -1,4 +1,4 @@
-import { ILocalStore } from "@utils/useLocalStore";
+import { ILocalStore } from "utils/useLocalStore";
 import { action, computed, makeObservable, observable } from "mobx";
 
 type PrivateFields = "_current";

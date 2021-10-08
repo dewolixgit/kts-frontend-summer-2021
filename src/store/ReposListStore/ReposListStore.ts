@@ -2,17 +2,17 @@ import {
   normalizeRepoItem,
   RepoItemApi,
   RepoItemModel,
-} from "@store/models/gitHub";
+} from "store/models/gitHub";
 import {
   concatCollections,
   CollectionModel,
   getInitialCollectionModel,
   normilizeElementsAndCollection,
   linearizeCollection,
-} from "@store/models/shared/collection";
-import { log } from "@utils/log";
-import { Meta } from "@utils/meta";
-import { ILocalStore } from "@utils/useLocalStore";
+} from "store/models/shared/collection";
+import { log } from "utils/log";
+import { Meta } from "utils/meta";
+import { ILocalStore } from "utils/useLocalStore";
 import {
   action,
   computed,
@@ -76,18 +76,18 @@ export default class ReposListStore implements IReposListStore, ILocalStore {
       : {};
 
     const paramsToRequest: RequestParams<GetOrganizationReposListParamsForQueryStr> =
-      {
-        method: HTTPMethod.GET,
-        headers: headersObj,
-        endpoint: `/orgs/${params.org}/repos`,
-        data: {
-          type: params.type,
-          sort: params.sort,
-          per_page: params.per_page,
-          page: params.page,
-          direction: params.direction,
-        },
-      };
+    {
+      method: HTTPMethod.GET,
+      headers: headersObj,
+      endpoint: `/orgs/${params.org}/repos`,
+      data: {
+        type: params.type,
+        sort: params.sort,
+        per_page: params.per_page,
+        page: params.page,
+        direction: params.direction,
+      },
+    };
 
     const response = await this._apiStore.request<RepoItemApi[]>(
       paramsToRequest
