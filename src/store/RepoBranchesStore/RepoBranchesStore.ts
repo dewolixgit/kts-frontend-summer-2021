@@ -1,9 +1,5 @@
 import ApiStore from "shared/store/ApiStore";
-import {
-  ApiResponse,
-  HTTPMethod,
-  RequestParams,
-} from "shared/store/ApiStore/types";
+import { HTTPMethod, RequestParams } from "shared/store/ApiStore/types";
 import {
   BranchItemApi,
   BranchItemModel,
@@ -18,7 +14,6 @@ import {
   linearizeCollection,
   normilizeElementsAndCollection,
 } from "store/models/shared/collection";
-import {} from "store/ReposListStore/types";
 import { log } from "utils/log";
 import { Meta } from "utils/meta";
 import { ILocalStore } from "utils/useLocalStore";
@@ -28,10 +23,10 @@ import {
   makeObservable,
   observable,
   runInAction,
-  toJS,
 } from "mobx";
 
 import { IRepoBranchesStore } from "./types";
+import RepoItemStore from "store/RepoItemStore";
 
 type PrivateFields = "_branches" | "_meta";
 
@@ -71,7 +66,6 @@ export default class RepoBranchesStore
       this._branches.order.length !== 0
         ? getInitialCollectionModel()
         : this._branches;
-    log("go to get repo branches", toJS(repo));
 
     const paramsToRequest: RequestParams<{}> = {
       method: HTTPMethod.GET,
@@ -107,7 +101,10 @@ export default class RepoBranchesStore
     });
   }
 
-  async loadRepoAndGetRepoBranches(id: string): Promise<void> {
+  async loadRepoAndGetRepoBranches(
+    id: string,
+    repoItemStore: RepoItemStore
+  ): Promise<void> {
     this._repoItem = null;
     this._branches = getInitialCollectionModel();
     this._meta = Meta.loading;
@@ -125,6 +122,7 @@ export default class RepoBranchesStore
       if (response.success) {
         try {
           this._repoItem = normalizeRepoItem(response.data);
+          repoItemStore.setRepoItem(this._repoItem);
 
           await this.getRepoBranches(this._repoItem);
         } catch (err) {

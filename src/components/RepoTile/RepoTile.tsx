@@ -11,10 +11,6 @@ type RepoTileProps = {
   repoItem: RepoItemModel;
 };
 
-type ClickHandler = {
-  onClick?: (event: React.MouseEvent) => void;
-};
-
 const RepoTile: React.FC<RepoTileProps> = ({ repoItem }) => {
   const repoNameFirstLetter = repoItem.name[0].toUpperCase();
   const repoUrl = `https://github.com/${repoItem.owner.login}/${repoItem.name}`;

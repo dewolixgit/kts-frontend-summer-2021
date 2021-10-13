@@ -1,11 +1,10 @@
 import { useHistory, useLocation } from "react-router";
-import { log } from "utils/log";
 
 import rootStore from "../instance";
 
-export const useQueryParamsStoreGlobalInit = (): void => {
-  log("init");
+export const useQueryParamsStoreInit = (): void => {
   const history = useHistory();
   const location = useLocation();
+  if (location.pathname !== "/repos") return;
   rootStore.query.setHistory(history, location);
 };

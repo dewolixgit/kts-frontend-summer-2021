@@ -13,23 +13,15 @@ import InputStore from "store/Input/InputStore";
 import RepoOwnerStore from "store/RepoOwnerStore";
 import GitHubStore from "store/ReposListStore";
 import ReposListStore from "store/ReposListStore";
-import { useQueryParamsStoreInit } from "./hooks/useQueryParamsStoreInit";
+import { useQueryParamsStoreInit } from "store/RootStore/hooks/useQueryParamsStoreInit";
 import { Meta } from "utils/meta";
 import { useLocalStore } from "utils/useLocalStore";
 import { observer } from "mobx-react-lite";
-import {
-  Redirect,
-  Route,
-  Switch,
-  useHistory,
-  useLocation,
-} from "react-router-dom";
+import { Redirect, Route, Switch } from "react-router-dom";
 
 import ReposListPage from "../ReposListPage";
 import styles from "./ReposSearchPage.module.scss";
 import rootStore from "store/RootStore";
-import qs from "qs";
-import { log } from "utils/log";
 import ButtonStore from "store/Button";
 
 type ReposContext = {
@@ -62,13 +54,15 @@ const ReposSearchPage = () => {
   const buttonStore = useLocalStore(() => new ButtonStore());
 
   const loadRepos = useCallback(
-    () =>
+    (event: React.MouseEvent | null) => {
       buttonStore.load(
         currentPageNumberStore,
         reposListStore,
         repoOwnerStore,
         inputStore
-      ),
+      );
+      if (event) event.preventDefault();
+    },
     [
       buttonStore,
       currentPageNumberStore,
@@ -79,7 +73,7 @@ const ReposSearchPage = () => {
   );
 
   useEffect(() => {
-    if (rootStore.query.searchParam) loadRepos();
+    if (rootStore.query.searchParam) loadRepos(null);
   }, [loadRepos]);
 
   return (
@@ -100,20 +94,20 @@ const ReposSearchPage = () => {
         </Button>
       </form>
 
-      <Switch>
-        <Provider
-          value={{
-            reposListStore: reposListStore,
-            inputStore: inputStore,
-            repoOwnerStore: repoOwnerStore,
-            currentPageNumberStore: currentPageNumberStore,
-          }}
-        >
+      <Provider
+        value={{
+          reposListStore: reposListStore,
+          inputStore: inputStore,
+          repoOwnerStore: repoOwnerStore,
+          currentPageNumberStore: currentPageNumberStore,
+        }}
+      >
+        <Switch>
           <Route path="/repos/:id" component={ReposListPage} />
           <Route exact path="/repos" component={ReposListPage} />
           <Redirect to="/repos" />
-        </Provider>
-      </Switch>
+        </Switch>
+      </Provider>
     </div>
   );
 };

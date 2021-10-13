@@ -13,11 +13,9 @@ import {
   makeObservable,
   observable,
   runInAction,
-  toJS,
 } from "mobx";
 
 import { IRepoItemStore } from "./types";
-import { log } from "utils/log";
 
 type PrivateFields = "_repoItem" | "_meta";
 
@@ -47,14 +45,13 @@ export default class RepoItemStore implements IRepoItemStore, ILocalStore {
     return this._repoItem;
   }
 
-  setRepoItem(repoItem: RepoItemModel): void {
+  setRepoItem(repoItem: RepoItemModel | null): void {
     this._repoItem = repoItem;
   }
 
   async requestRepoItem(id: string): Promise<void> {
     this._repoItem = null;
     this._meta = Meta.loading;
-    log("go to request repo item", id);
 
     const paramsToRequest: RequestParams<{}> = {
       method: HTTPMethod.GET,
@@ -67,12 +64,10 @@ export default class RepoItemStore implements IRepoItemStore, ILocalStore {
 
     runInAction(() => {
       if (response.success) {
-        log(response.success);
         try {
           this._meta = Meta.success;
 
           this._repoItem = normalizeRepoItem(response.data);
-          log(toJS(this._repoItem));
         } catch (err) {
           this._meta = Meta.error;
           this._repoItem = null;
@@ -86,6 +81,6 @@ export default class RepoItemStore implements IRepoItemStore, ILocalStore {
   }
 
   destroy(): void {
-    //nothing
+    //nothing to do
   }
 }

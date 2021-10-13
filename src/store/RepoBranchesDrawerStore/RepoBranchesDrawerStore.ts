@@ -1,7 +1,5 @@
 import { ILocalStore } from "utils/useLocalStore";
-import { History, Location } from "history";
-import { log } from "utils/log";
-import { toJS } from "mobx";
+import { History } from "history";
 
 export default class RepoBranchesDrawerStore implements ILocalStore {
   onClose(history: History): void {
@@ -12,7 +10,7 @@ export default class RepoBranchesDrawerStore implements ILocalStore {
     }
   }
 
-  destroy() {
+  destroy(): void {
     // nothing to do
   }
 }

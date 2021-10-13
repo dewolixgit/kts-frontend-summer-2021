@@ -25,7 +25,7 @@ export default class InfiniteScrollStore implements ILocalStore {
     });
   }
 
-  destroy() {
+  destroy(): void {
     // nothing to do
   }
 }

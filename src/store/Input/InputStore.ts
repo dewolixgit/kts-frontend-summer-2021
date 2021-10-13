@@ -7,9 +7,7 @@ import {
   observable,
   reaction,
 } from "mobx";
-import { useHistory } from "react-router";
 import rootStore from "store/RootStore";
-import { log } from "utils/log";
 
 type PrivateFields = "_currentValue";
 
@@ -22,8 +20,6 @@ export default class InputStore implements ILocalStore {
       setInputValue: action.bound,
       currentValue: computed,
     });
-
-    log(rootStore.query.searchParam);
   }
 
   get currentValue(): string {
@@ -31,7 +27,6 @@ export default class InputStore implements ILocalStore {
   }
 
   setInputValue(event: React.FormEvent<HTMLInputElement>): void {
-    // this._currentValue = event.currentTarget.value;
     rootStore.query.setParam("search", event.currentTarget.value);
   }
 
@@ -39,18 +34,9 @@ export default class InputStore implements ILocalStore {
     this.onChange();
   }
 
-  // private readonly onChange: IReactionDisposer = reaction(
-  //   () => this.currentValue,
-  //   (currentInputValue) => {
-  //     rootStore.query.setParam("search", currentInputValue);
-  //   }
-  // );
-
   private readonly onChange: IReactionDisposer = reaction(
     () => rootStore.query.searchParam,
-    (currentInputValue) => {
-      log("reaction", rootStore.query.searchParam);
-      // rootStore.query.setParam("search", currentInputValue);
+    () => {
       this._currentValue = rootStore.query.searchParam;
     },
     {

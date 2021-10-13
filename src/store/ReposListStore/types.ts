@@ -1,6 +1,3 @@
-import { RepoItemApi, RepoItemModel } from "store/models/gitHub";
-import { BranchItemApi } from "store/models/gitHub/branchItem";
-
 export type GetOrganizationReposListParams = {
   accept?: string;
   org: string;

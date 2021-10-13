@@ -2,7 +2,6 @@ import { action, computed, makeObservable, observable } from "mobx";
 import qs from "qs";
 import { IQueryParamsStore } from "./types";
 import { History, Location } from "history";
-import { log } from "utils/log";
 
 type PrivateFields = "_params" | "_searchParam";
 

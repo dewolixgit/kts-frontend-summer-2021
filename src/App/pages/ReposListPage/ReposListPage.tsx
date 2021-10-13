@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useCallback } from "react";
 
 import RepoBranchesDrawer from "components/RepoBranchesDrawer";
 import RepoTile from "components/RepoTile";
@@ -10,12 +10,9 @@ import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 
 import { UseReposSearchPageContext } from "pages/ReposSearchPage";
-import { log } from "utils/log";
 import InfiniteScrollStore from "store/InfiniteScrollStore";
 import RepoBranchesDrawerStore from "store/RepoBranchesDrawerStore";
-import { toJS } from "mobx";
-import ReposList from "components/ReposList";
-// import { useQueryParamsStoreInit } from "store/RootStore/hooks/useQueryParamsStoreInit";
+import Loader from "components/Loader";
 
 const ReposListPage = () => {
   const context = UseReposSearchPageContext();
@@ -56,7 +53,7 @@ const ReposListPage = () => {
           currentPageNumberStore: context.currentPageNumberStore,
         }}
       >
-        {context.reposListStore?.meta === Meta.loading && <div>Загрузка</div>}
+        {context.reposListStore?.meta === Meta.loading && <Loader />}
         {(context.reposListStore?.meta == Meta.success ||
           context.reposListStore?.meta == Meta.extraLoading) &&
           context.reposListStore?.repos && (
@@ -66,7 +63,7 @@ const ReposListPage = () => {
                 context.reposListStore,
                 context.repoOwnerStore
               )}
-              loader={<div>loading scroll</div>}
+              loader={<Loader />}
               dataLength={context.reposListStore?.repos.length}
             >
               <div className="repo-list">

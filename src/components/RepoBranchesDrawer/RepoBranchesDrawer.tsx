@@ -9,15 +9,11 @@ import RepoItemStore from "store/RepoItemStore";
 import { Meta } from "utils/meta";
 import { Drawer } from "antd";
 import { observer, useLocalStore } from "mobx-react-lite";
-import { useHistory, useLocation, useParams } from "react-router-dom";
-import { log } from "utils/log";
-import { toJS } from "mobx";
-import ReposListStore from "store/ReposListStore";
-// import { useQueryParamsStoreInit } from "store/RootStore/hooks/useQueryParamsStoreInit";
+import { useHistory, useParams } from "react-router-dom";
+import Loader from "components/Loader";
 
 type RepoBranchesDrawerProps = {
   onClose: () => void;
-  // visible: boolean;
 };
 
 type DrawerProperies = {
@@ -27,7 +23,6 @@ type DrawerProperies = {
 };
 
 const RepoBranchesDrawer: React.FC<RepoBranchesDrawerProps> = ({ onClose }) => {
-  log("go to repo branches drawer");
   const context = UseReposSearchPageContext();
 
   const repoBranchesStore = useLocalStore(() => new RepoBranchesStore());
@@ -37,40 +32,8 @@ const RepoBranchesDrawer: React.FC<RepoBranchesDrawerProps> = ({ onClose }) => {
 
   let branchCounterId = 0;
 
-  // useEffect(() => {
-  //   log(
-  //     "go to repo branches drawer use effect",
-  //     "repoId",
-  //     repoId,
-  //     context.reposListStore?.repos.length
-  //   );
-  //   if (
-  //     context.reposListStore?.repos.length !== 0 &&
-  //     repoId &&
-  //     context.reposListStore
-  //   ) {
-  //     const targetRepo: RepoItemModel =
-  //       context.reposListStore.getRepoCollection().entities[parseInt(repoId)];
-  //     repoBranchesStore.getRepoBranches(targetRepo);
-  //     repoItemStore.setRepoItem(targetRepo);
-  //   } else if (context.reposListStore?.repos.length == 0 && repoId) {
-  //     log("no repos, there is id");
-  //     repoItemStore.requestRepoItem(repoId);
-  //     log("in drawer after request repo item", repoItemStore.repoItem);
-  //     if (
-  //       repoItemStore.repoItem !== null &&
-  //       repoItemStore.meta === Meta.success
-  //     ) {
-  //       log(toJS(repoItemStore.repoItem));
-  //       repoBranchesStore.getRepoBranches(repoItemStore.repoItem);
-  //       repoItemStore.setRepoItem(repoItemStore.repoItem);
-  //     }
-  //   }
-  // }, []);
-
   const history = useHistory();
   useEffect(() => {
-    log("history", history);
     if (
       context.reposListStore?.repos.length !== 0 &&
       repoId &&
@@ -81,9 +44,15 @@ const RepoBranchesDrawer: React.FC<RepoBranchesDrawerProps> = ({ onClose }) => {
       repoBranchesStore.getRepoBranches(targetRepo);
       repoItemStore.setRepoItem(targetRepo);
     } else if (context.reposListStore?.repos.length == 0 && repoId) {
-      repoBranchesStore.loadRepoAndGetRepoBranches(repoId);
+      repoBranchesStore.loadRepoAndGetRepoBranches(repoId, repoItemStore);
     }
-  }, []);
+  }, [
+    repoId,
+    context.reposListStore,
+    history,
+    repoBranchesStore,
+    repoItemStore,
+  ]);
 
   const drawerOptions = useMemo<DrawerProperies>(
     () => ({
@@ -96,10 +65,14 @@ const RepoBranchesDrawer: React.FC<RepoBranchesDrawerProps> = ({ onClose }) => {
 
   return (
     <Drawer {...drawerOptions}>
-      {repoBranchesStore.meta === Meta.loading && <div>Загрузка</div>}
+      {repoBranchesStore.meta === Meta.loading && <Loader />}
       {repoBranchesStore.meta === Meta.error && (
         <div>Не удалось загрузить ветки</div>
       )}
+      {repoBranchesStore.meta === Meta.success &&
+        repoBranchesStore.branches.length === 0 && (
+          <div>В этом репозитории нет веток</div>
+        )}
       {repoBranchesStore.meta === Meta.success && (
         <>
           <ul>
