@@ -39,6 +39,7 @@ export default class ReposListStore implements IReposListStore, ILocalStore {
   private _repos: CollectionModel<number, RepoItemModel> =
     getInitialCollectionModel();
   private _meta: Meta = Meta.initial;
+  private _currentOrgName = "";
 
   constructor() {
     makeObservable<ReposListStore, PrivateFields>(this, {
@@ -65,11 +66,15 @@ export default class ReposListStore implements IReposListStore, ILocalStore {
   async getOrganizationReposList(
     params: GetOrganizationReposListParams
   ): Promise<void> {
-    this._meta = Meta.loading;
+    this._meta =
+      this._repos.order.length !== 0 && params.org == this._currentOrgName
+        ? Meta.extraLoading
+        : Meta.loading;
     this._repos =
       params.page && params.page > 1
         ? this._repos
         : getInitialCollectionModel();
+    this._currentOrgName = params.org;
 
     const headersObj: Record<string, string> = params.accept
       ? { accept: params.accept }

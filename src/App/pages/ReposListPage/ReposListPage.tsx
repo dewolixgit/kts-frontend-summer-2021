@@ -1,20 +1,47 @@
-import React from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 
 import RepoBranchesDrawer from "components/RepoBranchesDrawer";
 import RepoTile from "components/RepoTile";
 import { Provider } from "../ReposSearchPage";
 import { Meta } from "utils/meta";
-import { observer } from "mobx-react-lite";
+import { observer, useLocalStore } from "mobx-react-lite";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 
 import { UseReposSearchPageContext } from "pages/ReposSearchPage";
+import { log } from "utils/log";
+import InfiniteScrollStore from "store/InfiniteScrollStore";
+import RepoBranchesDrawerStore from "store/RepoBranchesDrawerStore";
+import { toJS } from "mobx";
+import ReposList from "components/ReposList";
+// import { useQueryParamsStoreInit } from "store/RootStore/hooks/useQueryParamsStoreInit";
 
 const ReposListPage = () => {
   const context = UseReposSearchPageContext();
+  const infiniteScrollStore = useLocalStore(() => new InfiniteScrollStore());
+  const repoBranchesDrawerStore = useLocalStore(
+    () => new RepoBranchesDrawerStore()
+  );
+
+  const nextPageLoad = useCallback(() => {
+    infiniteScrollStore.loadNext(
+      context.currentPageNumberStore,
+      context.reposListStore,
+      context.inputStore
+    );
+  }, [
+    context.currentPageNumberStore,
+    context.reposListStore,
+    context.inputStore,
+    infiniteScrollStore,
+  ]);
 
   const history = useHistory();
+
+  const closeHandle = useCallback(() => {
+    repoBranchesDrawerStore.onClose(history);
+  }, [repoBranchesDrawerStore, history]);
 
   return (
     <div>
@@ -30,46 +57,35 @@ const ReposListPage = () => {
         }}
       >
         {context.reposListStore?.meta === Meta.loading && <div>Загрузка</div>}
-        {context.reposListStore?.meta !== Meta.loading &&
+        {(context.reposListStore?.meta == Meta.success ||
+          context.reposListStore?.meta == Meta.extraLoading) &&
           context.reposListStore?.repos && (
             <InfiniteScroll
-              next={() => {
-                context.currentPageNumberStore?.increment();
-                context.reposListStore?.getOrganizationReposList({
-                  per_page: 10,
-                  page: context.currentPageNumberStore?.current,
-                  org: context.inputStore?.currentValue
-                    ? context.inputStore?.currentValue
-                    : "",
-                });
-              }}
-              hasMore={
-                context.reposListStore.repos.length !==
-                context.repoOwnerStore?.owner?.publicRepos
-              }
-              loader={<div></div>}
+              next={nextPageLoad}
+              hasMore={infiniteScrollStore.doesHasMore(
+                context.reposListStore,
+                context.repoOwnerStore
+              )}
+              loader={<div>loading scroll</div>}
               dataLength={context.reposListStore?.repos.length}
             >
               <div className="repo-list">
                 {context.reposListStore.repos.map((repoItem) => (
-                  <Link to={`/repos/${repoItem.id}`} key={repoItem.id}>
-                    <RepoTile
-                      name={repoItem.name}
-                      owner={repoItem.owner}
-                      stargazersCount={repoItem.stargazersCount}
-                      updatedAt={repoItem.updatedAt}
-                      id={repoItem.id}
-                    />
+                  <Link
+                    to={{
+                      pathname: `/repos/${repoItem.id}`,
+                      state: { prevSearch: history.location.search },
+                    }}
+                    key={repoItem.id}
+                  >
+                    <RepoTile repoItem={repoItem} />
                   </Link>
                 ))}
               </div>
+              {/* <ReposList repos={context.reposListStore.repos} /> */}
             </InfiniteScroll>
           )}
-        <RepoBranchesDrawer
-          onClose={() => {
-            history.push("/repos");
-          }}
-        />
+        <RepoBranchesDrawer onClose={closeHandle} />
       </Provider>
     </div>
   );

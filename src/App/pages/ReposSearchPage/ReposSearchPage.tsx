@@ -1,4 +1,9 @@
-import React, { createContext, useContext } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+} from "react";
 
 import SearchIcon from "assets/SearchIcon/SearchIcon";
 import Button from "components/Button/Button";
@@ -8,14 +13,24 @@ import InputStore from "store/Input/InputStore";
 import RepoOwnerStore from "store/RepoOwnerStore";
 import GitHubStore from "store/ReposListStore";
 import ReposListStore from "store/ReposListStore";
-import { useQueryParamsStoreInit } from "store/RootStore/hooks/useQueryParamsStoreInit";
+import { useQueryParamsStoreInit } from "./hooks/useQueryParamsStoreInit";
 import { Meta } from "utils/meta";
 import { useLocalStore } from "utils/useLocalStore";
 import { observer } from "mobx-react-lite";
-import { Redirect, Route, Switch, useHistory } from "react-router";
+import {
+  Redirect,
+  Route,
+  Switch,
+  useHistory,
+  useLocation,
+} from "react-router-dom";
 
 import ReposListPage from "../ReposListPage";
 import styles from "./ReposSearchPage.module.scss";
+import rootStore from "store/RootStore";
+import qs from "qs";
+import { log } from "utils/log";
+import ButtonStore from "store/Button";
 
 type ReposContext = {
   reposListStore: ReposListStore | null;
@@ -37,16 +52,35 @@ export const UseReposSearchPageContext = (): ReposContext =>
   useContext(ReposSearchPageContext);
 
 const ReposSearchPage = () => {
+  useQueryParamsStoreInit();
   const reposListStore = useLocalStore(() => new GitHubStore());
   const inputStore = useLocalStore(() => new InputStore());
   const repoOwnerStore = useLocalStore(() => new RepoOwnerStore());
   const currentPageNumberStore = useLocalStore(
     () => new CurrentPageNumberStore()
   );
+  const buttonStore = useLocalStore(() => new ButtonStore());
 
-  useQueryParamsStoreInit();
+  const loadRepos = useCallback(
+    () =>
+      buttonStore.load(
+        currentPageNumberStore,
+        reposListStore,
+        repoOwnerStore,
+        inputStore
+      ),
+    [
+      buttonStore,
+      currentPageNumberStore,
+      reposListStore,
+      repoOwnerStore,
+      inputStore,
+    ]
+  );
 
-  const history = useHistory();
+  useEffect(() => {
+    if (rootStore.query.searchParam) loadRepos();
+  }, [loadRepos]);
 
   return (
     <div className={styles["repos-search-page"]}>
@@ -54,22 +88,12 @@ const ReposSearchPage = () => {
         <Input
           placeholder={"Введите название организации"}
           value={inputStore.currentValue}
-          onChange={(event) => {
-            inputStore.setInputValue(event.currentTarget.value);
-            history.push(`?search=${inputStore.currentValue}`);
-          }}
+          onChange={inputStore.setInputValue}
           isDisabled={reposListStore.meta === Meta.loading}
         />
 
         <Button
-          onClick={() => {
-            currentPageNumberStore.reset();
-            reposListStore.getOrganizationReposList({
-              org: inputStore.currentValue,
-              per_page: 10,
-            });
-            repoOwnerStore.getRepoOwnerInfo(inputStore.currentValue);
-          }}
+          onClick={loadRepos}
           disabled={reposListStore.meta === Meta.loading}
         >
           <SearchIcon />
@@ -85,7 +109,7 @@ const ReposSearchPage = () => {
             currentPageNumberStore: currentPageNumberStore,
           }}
         >
-          <Route exact path="/repos/:id" component={ReposListPage} />
+          <Route path="/repos/:id" component={ReposListPage} />
           <Route exact path="/repos" component={ReposListPage} />
           <Redirect to="/repos" />
         </Provider>

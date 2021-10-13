@@ -1,6 +1,6 @@
 import React from "react";
 
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Redirect } from "react-router-dom";
 
 import "./App.scss";
 import ReposSearchPage from "pages/ReposSearchPage";
@@ -10,6 +10,7 @@ const App = (): React.ReactElement => {
     <>
       <BrowserRouter>
         <ReposSearchPage />
+        {/* <Redirect exact to="/repos" /> */}
       </BrowserRouter>
     </>
   );

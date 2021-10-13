@@ -8,6 +8,8 @@ import {
   BranchItemApi,
   BranchItemModel,
   normalizeBranchItem,
+  normalizeRepoItem,
+  RepoItemApi,
   RepoItemModel,
 } from "store/models/gitHub";
 import {
@@ -26,6 +28,7 @@ import {
   makeObservable,
   observable,
   runInAction,
+  toJS,
 } from "mobx";
 
 import { IRepoBranchesStore } from "./types";
@@ -41,6 +44,7 @@ export default class RepoBranchesStore
 
   private _branches: CollectionModel<string, BranchItemModel> =
     getInitialCollectionModel();
+  private _repoItem: RepoItemModel | null = null;
   private _meta: Meta = Meta.initial;
 
   constructor() {
@@ -63,7 +67,11 @@ export default class RepoBranchesStore
 
   async getRepoBranches(repo: RepoItemModel): Promise<void> {
     this._meta = Meta.loading;
-    this._branches = getInitialCollectionModel();
+    this._branches =
+      this._branches.order.length !== 0
+        ? getInitialCollectionModel()
+        : this._branches;
+    log("go to get repo branches", toJS(repo));
 
     const paramsToRequest: RequestParams<{}> = {
       method: HTTPMethod.GET,
@@ -94,6 +102,39 @@ export default class RepoBranchesStore
       }
 
       if (!responce.success) {
+        this._meta = Meta.error;
+      }
+    });
+  }
+
+  async loadRepoAndGetRepoBranches(id: string): Promise<void> {
+    this._repoItem = null;
+    this._branches = getInitialCollectionModel();
+    this._meta = Meta.loading;
+
+    const paramsToRequest: RequestParams<{}> = {
+      method: HTTPMethod.GET,
+      headers: {},
+      endpoint: `/repositories/${id}`,
+      data: {},
+    };
+
+    const response = await this._apiStore.request<RepoItemApi>(paramsToRequest);
+
+    runInAction(async () => {
+      if (response.success) {
+        try {
+          this._repoItem = normalizeRepoItem(response.data);
+
+          await this.getRepoBranches(this._repoItem);
+        } catch (err) {
+          log(err);
+          this._meta = Meta.error;
+          this._repoItem = null;
+        }
+      }
+
+      if (!response.success) {
         this._meta = Meta.error;
       }
     });
