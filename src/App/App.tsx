@@ -1,6 +1,6 @@
 import React from "react";
 
-import { BrowserRouter } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 
 import "./App.scss";
 import ReposSearchPage from "pages/ReposSearchPage";
@@ -8,9 +8,9 @@ import ReposSearchPage from "pages/ReposSearchPage";
 const App = (): React.ReactElement => {
   return (
     <>
-      <BrowserRouter>
+      <HashRouter>
         <ReposSearchPage />
-      </BrowserRouter>
+      </HashRouter>
     </>
   );
 };

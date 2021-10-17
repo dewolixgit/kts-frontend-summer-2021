@@ -11,6 +11,7 @@ import { Drawer } from "antd";
 import { observer, useLocalStore } from "mobx-react-lite";
 import { useHistory, useParams } from "react-router-dom";
 import Loader from "components/Loader";
+import { LocationStateProps } from "shared/types/LocationStateProps";
 
 type RepoBranchesDrawerProps = {
   onClose: () => void;
@@ -32,12 +33,13 @@ const RepoBranchesDrawer: React.FC<RepoBranchesDrawerProps> = ({ onClose }) => {
 
   let branchCounterId = 0;
 
-  const history = useHistory();
+  const history = useHistory<LocationStateProps>();
   useEffect(() => {
     if (
+      context.reposListStore &&
       context.reposListStore?.repos.length !== 0 &&
       repoId &&
-      context.reposListStore
+      history.location.state?.prevSearch
     ) {
       const targetRepo: RepoItemModel =
         context.reposListStore.getRepoCollection().entities[parseInt(repoId)];

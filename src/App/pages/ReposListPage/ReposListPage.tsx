@@ -13,6 +13,7 @@ import { UseReposSearchPageContext } from "pages/ReposSearchPage";
 import InfiniteScrollStore from "store/InfiniteScrollStore";
 import RepoBranchesDrawerStore from "store/RepoBranchesDrawerStore";
 import Loader from "components/Loader";
+import { LocationStateProps } from "shared/types/LocationStateProps";
 
 const ReposListPage = () => {
   const context = UseReposSearchPageContext();
@@ -34,11 +35,11 @@ const ReposListPage = () => {
     infiniteScrollStore,
   ]);
 
-  const history = useHistory();
+  const history = useHistory<LocationStateProps>();
 
   const closeHandle = useCallback(() => {
-    repoBranchesDrawerStore.onClose(history);
-  }, [repoBranchesDrawerStore, history]);
+    repoBranchesDrawerStore.onClose(history, context.reposListStore);
+  }, [repoBranchesDrawerStore, history, context.reposListStore]);
 
   return (
     <div>
@@ -71,7 +72,9 @@ const ReposListPage = () => {
                   <Link
                     to={{
                       pathname: `/repos/${repoItem.id}`,
-                      state: { prevSearch: history.location.search },
+                      state: {
+                        prevSearch: history.location.search,
+                      },
                     }}
                     key={repoItem.id}
                   >
@@ -79,7 +82,6 @@ const ReposListPage = () => {
                   </Link>
                 ))}
               </div>
-              {/* <ReposList repos={context.reposListStore.repos} /> */}
             </InfiniteScroll>
           )}
         <RepoBranchesDrawer onClose={closeHandle} />

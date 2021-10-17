@@ -12,7 +12,7 @@ const ESLintPlugin = require('eslint-webpack-plugin')
 const bulidPath = path.resolve(__dirname, 'build')
 const srcPath = path.resolve(__dirname, 'src')
 
-const isProd = process.env.NODE_ENV === 'production'
+const isProd = process.env.NODE_ENV === 'production';
 
 const getSettingsForStyles = (withModules = false) => {
   return [
@@ -43,12 +43,12 @@ const getSettingsForStyles = (withModules = false) => {
 
 module.exports = {
   entry: path.join(srcPath, 'index.tsx'),
-  target: !isProd ? 'web' : 'browserslist',
+  target: !isProd ? 'web' : 'browserslist:last 2 versions',
   devtool: isProd ? 'hidden-source-map' : 'eval-source-map',
   output: {
     path: bulidPath,
     filename: 'bundle.js',
-    publicPath: isProd ? '' : '/',
+    publicPath: isProd ? '/kts-frontend-summer-2021/' : "/",
   },
   plugins: [
     new ESLintPlugin({
@@ -67,7 +67,7 @@ module.exports = {
       new MiniCssExtrctPlugin({
         filename: '[name]-[hash].css',
       }),
-    new TsCheckerPlugin(),
+    new TsCheckerPlugin()
   ].filter(Boolean),
   module: {
     rules: [
